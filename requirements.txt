@@ -1,3 +1,11 @@
 npm install
 npm outdated
 npm update
+npm install # instala Node_modules y la mayoria de las dependencias.
+npm outdated # Muestra las versiones que tiene react y react native en el proyecto.
+npm update # en caso de tener una version antigua de los lenguajes o de alguna dependencia con esto podemos actulizarlas.
+npx expo install react-dom react-native-web @expo/metro-runtime # Para poder ejecutar el Proyecto de manera web debemos instalar las depencias para que expo pueda reconocer y levantar la web.
+npx install lint #este codigo es una dependencia para instalar eslint, ESLint es un proyecto de código abierto que lo ayuda a encontrar y solucionar problemas con su código JavaScript. 
+npx expo install -- --save-dev prettier eslint-config-prettier eslint-plugin-prettier # # este codigo es sumamente necesario para poder dejar configuradas las instancia de eslint.
+npx expo install expo-constants # Instala las constantes para solucionar problemas de compatibilidad y agregar nuevas configuraciones,dar informacion del dispositivo y las versiones de expo
+
