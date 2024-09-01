@@ -1,13 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-const Register = () => {
+export default function Register() {
   return (
     <View style={styles.container}>
       <Text>Registro de Usuario</Text>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -17,5 +17,3 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
   },
 });
-
-export default Register;
