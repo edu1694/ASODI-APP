@@ -27,13 +27,13 @@ const Login = () => {
       Alert.alert('Error', 'Por favor, ingresa tu correo y contraseña');
       return;
     }
-
+  
     const baseUrl = Platform.OS === 'web'
       ? CONFIG.apiBaseUrl.web
       : Platform.OS === 'android'
         ? CONFIG.apiBaseUrl.android
         : CONFIG.apiBaseUrl.ios;
-
+  
     try {
       const response = await fetch(baseUrl, {
         method: 'GET',
@@ -41,20 +41,23 @@ const Login = () => {
           'Content-Type': 'application/json',
         }
       });
-
+  
       if (!response.ok) {
         throw new Error('Error en la solicitud');
       }
-
+  
       const usuarios = await response.json();
-
+  
       const usuarioEncontrado = usuarios.find(user =>
         user.correo === correo && user.password === password
       );
-
+  
       if (usuarioEncontrado) {
         Alert.alert('Éxito', 'Inicio de sesión exitoso');
         console.log('Inicio de sesión exitoso:', usuarioEncontrado);
+  
+        // Redirigir al componente Home después del inicio de sesión
+        navigation.navigate('Home');
       } else {
         Alert.alert('Error', 'Usuario no encontrado o contraseña incorrecta');
         console.log('Error de inicio de sesión: Usuario no encontrado o contraseña incorrecta');
