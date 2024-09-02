@@ -1,11 +1,28 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView, Image } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/Ionicons'; 
+import { Picker } from '@react-native-picker/picker'; 
+import Icon from 'react-native-vector-icons/Ionicons';
+import { Platform } from 'react-native';
 import CONFIG from '../lib/config';
 
+const CustomCheckbox = ({ value, onValueChange }) => {
+  return (
+    <TouchableOpacity
+      onPress={() => onValueChange(!value)}
+      style={[styles.checkbox, value && styles.checkboxChecked]}
+    >
+      {value && <Icon name="checkmark" size={20} color="white" />}
+    </TouchableOpacity>
+  );
+};
+
 const FichaMedica = () => {
+  const navigation = useNavigation();
+  const route = useRoute(); 
+  const { rut } = route.params; 
+
   const [edad, setEdad] = useState('');
   const [estatura, setEstatura] = useState('');
   const [sexo, setSexo] = useState('');
@@ -18,53 +35,59 @@ const FichaMedica = () => {
   const [epilepsia, setEpilepsia] = useState(false);
   const [alergias, setAlergias] = useState(false);
   const [numeroContacto, setNumeroContacto] = useState('');
-  const navigation = useNavigation();
 
-  const manejarFichaMedica = async () => {
+  const handleSaveFicha = async () => {
     if (!edad || !estatura || !sexo || !hospital || !numeroContacto) {
       Alert.alert('Error', 'Por favor, completa todos los campos obligatorios.');
       return;
     }
-
+  
     const baseUrl = Platform.OS === 'web'
       ? CONFIG.apiBaseUrl.web
       : Platform.OS === 'android'
         ? CONFIG.apiBaseUrl.android
         : CONFIG.apiBaseUrl.ios;
-
+  
+    const fichaData = {
+      edad: parseInt(edad),
+      estatura: parseFloat(estatura),
+      sexo,
+      hospital_perteneciente: hospital,
+      diabetes,
+      hipertension,
+      enfermedad_corazon: enfermedadCorazon,
+      accidente_vascular: accidenteVascular,
+      trombosis,
+      epilepsia,
+      alergias,
+      numero_contacto: parseInt(numeroContacto),
+      usuario: rut 
+    };
+  
     try {
-      const response = await fetch(`${baseUrl}/fichas`, {
+      const response = await fetch(`${baseUrl}/asodi/v1/usuarios/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          edad: parseInt(edad),
-          estatura: parseFloat(estatura),
-          sexo,
-          hospital_perteneciente: hospital,
-          diabetes,
-          hipertension,
-          enfermedad_corazon: enfermedadCorazon,
-          accidente_vascular: accidenteVascular,
-          trombosis,
-          epilepsia,
-          alergias,
-          numero_contacto: parseInt(numeroContacto),
-        }),
+        body: JSON.stringify(fichaData),
       });
-
-      if (!response.ok) {
-        throw new Error('Error en la creación de la ficha médica');
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        Alert.alert('Éxito', 'Ficha médica guardada exitosamente.');
+        navigation.navigate('Home', { rut });
+      } else {
+        console.error('Error al guardar la ficha médica:', data);
+        Alert.alert('Error', `Error al guardar la ficha médica: ${data.message || 'Error desconocido'}`);
       }
-
-      Alert.alert('Éxito', 'Ficha médica creada exitosamente');
-      navigation.navigate('Home');
     } catch (error) {
-      console.error('Error al crear la ficha médica:', error);
-      Alert.alert('Error', 'No se pudo crear la ficha médica');
+      console.error('Error:', error);
+      Alert.alert('Error', 'No se pudo guardar la ficha médica');
     }
   };
+  
 
   return (
     <SafeAreaView style={styles.container}>
@@ -78,6 +101,7 @@ const FichaMedica = () => {
           onChangeText={setEdad}
           value={edad}
         />
+
         <TextInput
           style={styles.input}
           placeholder="Estatura (m)"
@@ -85,18 +109,62 @@ const FichaMedica = () => {
           onChangeText={setEstatura}
           value={estatura}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="Sexo (M/F)"
-          onChangeText={setSexo}
-          value={sexo}
-        />
+
+        <View style={styles.pickerContainer}>
+          <Text style={styles.label}>Sexo</Text>
+          <Picker
+            selectedValue={sexo}
+            style={styles.picker}
+            onValueChange={(itemValue) => setSexo(itemValue)}
+          >
+            <Picker.Item label="Selecciona tu sexo" value="" />
+            <Picker.Item label="Hombre" value="M" />
+            <Picker.Item label="Mujer" value="F" />
+          </Picker>
+        </View>
+
         <TextInput
           style={styles.input}
           placeholder="Hospital Perteneciente"
           onChangeText={setHospital}
           value={hospital}
         />
+
+        <View style={styles.checkboxContainer}>
+          <Text style={styles.label}>¿Tienes diabetes?</Text>
+          <CustomCheckbox value={diabetes} onValueChange={setDiabetes} />
+        </View>
+
+        <View style={styles.checkboxContainer}>
+          <Text style={styles.label}>¿Tienes hipertensión?</Text>
+          <CustomCheckbox value={hipertension} onValueChange={setHipertension} />
+        </View>
+
+        <View style={styles.checkboxContainer}>
+          <Text style={styles.label}>¿Tienes enfermedad del corazón?</Text>
+          <CustomCheckbox value={enfermedadCorazon} onValueChange={setEnfermedadCorazon} />
+        </View>
+
+        <View style={styles.checkboxContainer}>
+          <Text style={styles.label}>¿Has tenido un accidente vascular?</Text>
+          <CustomCheckbox value={accidenteVascular} onValueChange={setAccidenteVascular} />
+        </View>
+
+        <View style={styles.checkboxContainer}>
+          <Text style={styles.label}>¿Tienes trombosis?</Text>
+          <CustomCheckbox value={trombosis} onValueChange={setTrombosis} />
+        </View>
+
+        <View style={styles.checkboxContainer}>
+          <Text style={styles.label}>¿Tienes epilepsia?</Text>
+          <CustomCheckbox value={epilepsia} onValueChange={setEpilepsia} />
+        </View>
+
+        <View style={styles.checkboxContainer}>
+          <Text style={styles.label}>¿Tienes alergias?</Text>
+          <CustomCheckbox value={alergias} onValueChange={setAlergias} />
+        </View>
+
         <TextInput
           style={styles.input}
           placeholder="Número de Contacto"
@@ -105,55 +173,8 @@ const FichaMedica = () => {
           value={numeroContacto}
         />
 
-        {/* Sección de Enfermedades */}
-        <View style={styles.switchContainer}>
-          <Text style={styles.label}>Diabetes</Text>
-          <TouchableOpacity onPress={() => setDiabetes(!diabetes)}>
-            <Icon name={diabetes ? 'checkbox' : 'square-outline'} size={24} color="grey" />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.switchContainer}>
-          <Text style={styles.label}>Hipertensión</Text>
-          <TouchableOpacity onPress={() => setHipertension(!hipertension)}>
-            <Icon name={hipertension ? 'checkbox' : 'square-outline'} size={24} color="grey" />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.switchContainer}>
-          <Text style={styles.label}>Enfermedad del Corazón</Text>
-          <TouchableOpacity onPress={() => setEnfermedadCorazon(!enfermedadCorazon)}>
-            <Icon name={enfermedadCorazon ? 'checkbox' : 'square-outline'} size={24} color="grey" />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.switchContainer}>
-          <Text style={styles.label}>Accidente Vascular</Text>
-          <TouchableOpacity onPress={() => setAccidenteVascular(!accidenteVascular)}>
-            <Icon name={accidenteVascular ? 'checkbox' : 'square-outline'} size={24} color="grey" />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.switchContainer}>
-          <Text style={styles.label}>Trombosis</Text>
-          <TouchableOpacity onPress={() => setTrombosis(!trombosis)}>
-            <Icon name={trombosis ? 'checkbox' : 'square-outline'} size={24} color="grey" />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.switchContainer}>
-          <Text style={styles.label}>Epilepsia</Text>
-          <TouchableOpacity onPress={() => setEpilepsia(!epilepsia)}>
-            <Icon name={epilepsia ? 'checkbox' : 'square-outline'} size={24} color="grey" />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.switchContainer}>
-          <Text style={styles.label}>Alergias</Text>
-          <TouchableOpacity onPress={() => setAlergias(!alergias)}>
-            <Icon name={alergias ? 'checkbox' : 'square-outline'} size={24} color="grey" />
-          </TouchableOpacity>
-        </View>
-
-        <TouchableOpacity 
-          style={styles.submitButton} 
-          onPress={manejarFichaMedica}
-        >
-          <Text style={styles.submitButtonText}>Guardar Ficha Médica</Text>
+        <TouchableOpacity style={styles.saveButton} onPress={handleSaveFicha}>
+          <Text style={styles.saveButtonText}>Guardar Ficha Médica</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
@@ -185,17 +206,41 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     backgroundColor: '#fff',
   },
-  switchContainer: {
+  pickerContainer: {
+    marginBottom: 15,
+  },
+  label: {
+    fontSize: 18,
+    color: '#333',
+    marginBottom: 5,
+  },
+  picker: {
+    height: 50,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 5,
+    backgroundColor: '#fff',
+  },
+  checkboxContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 15,
   },
-  label: {
-    fontSize: 16,
-    color: '#333',
+  checkbox: {
+    height: 24,
+    width: 24,
+    borderWidth: 2,
+    borderColor: '#ccc',
+    borderRadius: 4,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  submitButton: {
+  checkboxChecked: {
+    backgroundColor: '#1E90FF',
+  },
+  saveButton: {
     backgroundColor: '#1E90FF',
     borderRadius: 25,
     height: 50,
@@ -203,7 +248,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 20,
   },
-  submitButtonText: {
+  saveButtonText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',

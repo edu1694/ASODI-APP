@@ -6,6 +6,7 @@ import Login from './components/Login'; // Asegúrate de importar correctamente 
 import Register from './components/Register';
 import RecPassword from './components/RecPassword';
 import Home from './components/Home'; // Importa el componente Home
+import FichaMedica from './components/FichaMedica';
 
 const Stack = createStackNavigator();
 
@@ -28,6 +29,11 @@ export default function App() {
         <Stack.Screen 
           name="Home" 
           component={Home} 
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen 
+          name="FichaMedica" 
+          component={FichaMedica} 
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

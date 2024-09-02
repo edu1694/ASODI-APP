@@ -10,7 +10,7 @@ import {
   Platform,
   TouchableOpacity
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native'; // Importa useNavigation
+import { useNavigation } from '@react-navigation/native'; 
 import { SafeAreaView } from 'react-native-safe-area-context'; 
 import Icon from 'react-native-vector-icons/Ionicons'; 
 import CONFIG from '../lib/config';
@@ -20,7 +20,7 @@ const Login = () => {
   const [correo, setCorreo] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const navigation = useNavigation(); // Obtén la instancia de navegación
+  const navigation = useNavigation(); 
 
   const manejarLogin = async () => {
     if (!correo || !password) {
@@ -35,7 +35,7 @@ const Login = () => {
         : CONFIG.apiBaseUrl.ios;
   
     try {
-      const response = await fetch(baseUrl, {
+      const response = await fetch(`${baseUrl}/asodi/v1/usuarios/`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -55,9 +55,22 @@ const Login = () => {
       if (usuarioEncontrado) {
         Alert.alert('Éxito', 'Inicio de sesión exitoso');
         console.log('Inicio de sesión exitoso:', usuarioEncontrado);
-  
-        // Redirigir al componente Home después del inicio de sesión
-        navigation.navigate('Home');
+
+        // Verificar si el usuario ya tiene la ficha médica completada
+        const fichaResponse = await fetch(`${baseUrl}/asodi/v1/fichas/${usuarioEncontrado.rut}/`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+
+        if (fichaResponse.ok) {
+          // Si la ficha existe, redirigir a Home
+          navigation.navigate('Home', { rut: usuarioEncontrado.rut });
+        } else {
+          // Si no existe, redirigir a la pantalla de Ficha Médica
+          navigation.navigate('FichaMedica', { rut: usuarioEncontrado.rut });
+        }
       } else {
         Alert.alert('Error', 'Usuario no encontrado o contraseña incorrecta');
         console.log('Error de inicio de sesión: Usuario no encontrado o contraseña incorrecta');
