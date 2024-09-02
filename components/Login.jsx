@@ -13,6 +13,8 @@ import {
 import { useNavigation } from '@react-navigation/native'; // Importa useNavigation
 import { SafeAreaView } from 'react-native-safe-area-context'; 
 import Icon from 'react-native-vector-icons/Ionicons'; 
+import CONFIG from '../lib/config';
+
 
 const Login = () => {
   const [correo, setCorreo] = useState('');
