@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/Ionicons'; // Importar ícono
 import { useNavigation } from '@react-navigation/native';
+import CONFIG from '../lib/config';
 
 // Función para formatear el RUT
 const formatRut = (rut) => {
@@ -55,7 +56,7 @@ const Register = () => {
 
     // Estructura de los datos a enviar
     const nuevoUsuario = {
-      rut: rut.replace(/[^\dKk]/g, ''), // Eliminar puntos y guiones para enviar el RUT sin formato
+      rut: formatRut(rut), // Mantén el formato con puntos y guiones
       nombre,
       apellido,
       fecha_nacimiento: fechaNacimiento.toISOString().split('T')[0], // Convertir la fecha a formato YYYY-MM-DD
@@ -63,9 +64,15 @@ const Register = () => {
       password,
     };
 
+    const baseUrl = Platform.OS === 'web'
+      ? CONFIG.apiBaseUrl.web
+      : Platform.OS === 'android'
+        ? CONFIG.apiBaseUrl.android
+        : CONFIG.apiBaseUrl.ios;
+
     try {
       // Enviar datos a la API con una solicitud POST
-      const response = await fetch('http://127.0.0.1:8000/asodi/v1/usuarios/', {
+      const response = await fetch(baseUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
