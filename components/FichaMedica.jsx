@@ -65,7 +65,7 @@ const FichaMedica = () => {
     };
   
     try {
-      const response = await fetch(`${baseUrl}/asodi/v1/usuarios/`, {
+      const response = await fetch(`${baseUrl}/asodi/v1/fichas/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
