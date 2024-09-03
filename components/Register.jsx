@@ -72,7 +72,7 @@ const Register = () => {
 
     try {
       // Enviar datos a la API con una solicitud POST
-      const response = await fetch(baseUrl, {
+      const response = await fetch(`${baseUrl}/asodi/v1/usuarios/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
