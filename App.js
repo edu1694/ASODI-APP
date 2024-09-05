@@ -1,22 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'; // Para el Tab Navigator
-import { Ionicons } from '@expo/vector-icons'; // Para los íconos
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
+import 'react-native-gesture-handler';
+import CustomDrawerContent from './lib/CustomDrawerContent'; 
 
 // Importa tus componentes
-import Login from './components/Login';
+import Login from './components/Login'; 
 import Register from './components/Register';
 import RecPassword from './components/RecPassword';
-import Home from './components/Home';
+import Home from './components/Home'; 
+import FichaMedica from './components/FichaMedica';
 import PesoPresionChart from './components/PesoPresionChart';
 import RegistrarPresion from './components/RegistrarPresion';
+import RegistrarPeso from './components/RegistrarPeso';
 
+// Declaraciones de navegadores
 const Stack = createStackNavigator();
-const Tab = createBottomTabNavigator(); // Crea el Tab Navigator
+const Drawer = createDrawerNavigator();
+const Tab = createBottomTabNavigator();
 
-// Función que define el Tab Navigator con las secciones "Resumen", "Principal" y "Panel Informativo"
+// Tab Navigator para "Resumen", "Principal", y "Panel Informativo"
 function HomeTabs() {
   return (
     <Tab.Navigator
@@ -32,12 +39,11 @@ function HomeTabs() {
             iconName = focused ? 'information-circle' : 'information-circle-outline';
           }
 
-          // Devuelve el ícono adecuado basado en la pestaña activa
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: '#333',
         tabBarInactiveTintColor: 'gray',
-        headerShown: false, // No mostrar el header dentro de las pestañas
+        headerShown: false, // Oculta el header en las pestañas
       })}
     >
       <Tab.Screen name="Resumen" component={PesoPresionChart} />
@@ -47,21 +53,83 @@ function HomeTabs() {
   );
 }
 
-// Función principal que define el Stack Navigator, incluyendo el Tab Navigator
+// Stack Navigator para las pantallas de autenticación
+function AuthStackNavigator({ onLogin }) {
+  return (
+    <Stack.Navigator initialRouteName="Login">
+      <Stack.Screen 
+        name="Login" 
+        options={{ headerShown: false }}
+      >
+        {(props) => <Login {...props} onLogin={onLogin} />}
+      </Stack.Screen>
+      <Stack.Screen 
+        name="Register" 
+        component={Register} 
+        options={{ headerShown: false }} 
+      />
+      <Stack.Screen 
+        name="RecPassword" 
+        component={RecPassword} 
+        options={{ headerShown: false }} 
+      />
+      <Stack.Screen 
+        name="FichaMedica" 
+        component={FichaMedica} 
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+// Drawer Navigator que contiene la pantalla Home (con Tabs) y otras pantallas
+function MainDrawerNavigator({ onLogout }) {
+  return (
+    <Drawer.Navigator 
+      drawerContent={(props) => <CustomDrawerContent {...props} onLogout={onLogout} />}
+      screenOptions={{ headerShown: true, headerTitle: 'Asodi' }} // Cambiamos el título del Top Bar aquí
+    >
+      <Drawer.Screen 
+        name="Home" 
+        component={HomeTabs} 
+        options={{ drawerLabel: 'Inicio' }} // Aquí mantiene el nombre en el menú lateral
+      />
+      <Drawer.Screen 
+        name="RegistrarPresion" 
+        component={RegistrarPresion} 
+        options={{ drawerLabel: 'Registrar Presión' }} // Mantén el nombre en el menú lateral
+      />
+      <Drawer.Screen 
+        name="RegistrarPeso" 
+        component={RegistrarPeso} 
+        options={{ drawerLabel: 'Registrar Peso' }} // Mantén el nombre en el menú lateral
+      />
+    </Drawer.Navigator>
+  );
+}
+
+
+// Componente principal que integra ambos navegadores
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false); // Manejo del estado de autenticación
+
+  const handleLogin = () => {
+    setIsAuthenticated(true); // Cambia el estado a autenticado después de iniciar sesión
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false); // Cambia el estado a no autenticado después de cerrar sesión
+  };
+
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Register" component={Register} />
-        <Stack.Screen name="RecPassword" component={RecPassword} />
-        <Stack.Screen 
-          name="Home" 
-          component={HomeTabs} // Asegúrate de que este es el Tab Navigator
-          options={{ headerShown: false }}
-        />
-        {/* Añadir otras pantallas aquí */}
-      </Stack.Navigator>
+      {isAuthenticated ? (
+        // Si el usuario está autenticado, muestra el DrawerNavigator con Tabs en Home
+        <MainDrawerNavigator onLogout={handleLogout} />
+      ) : (
+        // Si el usuario no está autenticado, muestra el StackNavigator (Login, Register, RecPassword)
+        <AuthStackNavigator onLogin={handleLogin} />
+      )}
       <StatusBar style="light" />
     </NavigationContainer>
   );
