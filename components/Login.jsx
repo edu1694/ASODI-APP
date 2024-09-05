@@ -14,7 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context'; 
 import Icon from 'react-native-vector-icons/Ionicons'; 
 import CONFIG from '../lib/config';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login = () => {
   const [correo, setCorreo] = useState('');
@@ -55,7 +55,9 @@ const Login = () => {
       if (usuarioEncontrado) {
         Alert.alert('Éxito', 'Inicio de sesión exitoso');
         console.log('Inicio de sesión exitoso:', usuarioEncontrado);
-
+        // Guardar el RUT en AsyncStorage
+        await AsyncStorage.setItem('usuarioRut', usuarioEncontrado.rut);
+  
         // Verificar si el usuario ya tiene la ficha médica completada
         const fichaResponse = await fetch(`${baseUrl}/asodi/v1/fichas/${usuarioEncontrado.rut}/`, {
           method: 'GET',
@@ -63,10 +65,13 @@ const Login = () => {
             'Content-Type': 'application/json',
           }
         });
-
+  
         if (fichaResponse.ok) {
           // Si la ficha existe, redirigir a Home
-          navigation.navigate('Home', { rut: usuarioEncontrado.rut });
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Home' }]
+          });
         } else {
           // Si no existe, redirigir a la pantalla de Ficha Médica
           navigation.navigate('FichaMedica', { rut: usuarioEncontrado.rut });
