@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -28,18 +28,19 @@ const Tab = createBottomTabNavigator();
 function HomeTabs() {
   return (
     <Tab.Navigator
+      initialRouteName="Principal" // Selecciona "Principal" por defecto
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
-
+  
           if (route.name === 'Resumen') {
             iconName = focused ? 'bar-chart' : 'bar-chart-outline';
           } else if (route.name === 'Principal') {
-            iconName = focused ? 'home' : 'home-outline';
+            iconName = focused ? 'home' : 'home-outline'; // Corregido a 'home' y 'home-outline'
           } else if (route.name === 'Panel informativo') {
             iconName = focused ? 'information-circle' : 'information-circle-outline';
           }
-
+  
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: '#333',
@@ -94,8 +95,12 @@ function MainDrawerNavigator({ onLogout }) {
       <Drawer.Screen 
         name="Home" 
         component={HomeTabs} 
-        options={{ drawerLabel: 'Inicio' }} // Aquí mantiene el nombre en el menú lateral
+        options={{
+          drawerLabel: 'Inicio', 
+          drawerItemStyle: { display: 'none' }  // Esto hará que no sea visible en el menú lateral
+        }}
       />
+
       <Drawer.Screen 
         name="FichaMedicaDetalle" 
         component={FichaMedicaDetalle} 
@@ -114,6 +119,9 @@ function MainDrawerNavigator({ onLogout }) {
     </Drawer.Navigator>
   );
 }
+
+
+
 
 
 // Componente principal que integra ambos navegadores
