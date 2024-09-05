@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Platform } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Platform, Switch } from 'react-native';
+import { useRoute } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Picker } from '@react-native-picker/picker'; 
 import Icon from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import CONFIG from '../lib/config';
 
 const FichaMedicaDetalle = () => {
-  const navigation = useNavigation();
   const route = useRoute();
-  const { rut } = route.params;
+  const [rut, setRut] = useState(route.params?.rut || ''); // Mostrar pero no editable
 
-  const [editable, setEditable] = useState(false); // Para alternar entre vista y edición
+  const [editable, setEditable] = useState(false);
   const [edad, setEdad] = useState('');
   const [estatura, setEstatura] = useState('');
   const [sexo, setSexo] = useState('');
@@ -26,41 +26,58 @@ const FichaMedicaDetalle = () => {
   const [numeroContacto, setNumeroContacto] = useState('');
 
   useEffect(() => {
-    // Aquí puedes cargar los datos de la ficha médica existente para el usuario con RUT.
-    const fetchData = async () => {
+    const obtenerRutUsuario = async () => {
       try {
-        const baseUrl = Platform.OS === 'web'
-          ? CONFIG.apiBaseUrl.web
-          : Platform.OS === 'android'
-            ? CONFIG.apiBaseUrl.android
-            : CONFIG.apiBaseUrl.ios;
-
-        const response = await fetch(`${baseUrl}/asodi/v1/fichas/${rut}/`);
-        const data = await response.json();
-        if (response.ok) {
-          setEdad(data.edad.toString());
-          setEstatura(data.estatura.toString());
-          setSexo(data.sexo);
-          setHospital(data.hospital_perteneciente);
-          setDiabetes(data.diabetes);
-          setHipertension(data.hipertension);
-          setEnfermedadCorazon(data.enfermedad_corazon);
-          setAccidenteVascular(data.accidente_vascular);
-          setTrombosis(data.trombosis);
-          setEpilepsia(data.epilepsia);
-          setAlergias(data.alergias);
-          setNumeroContacto(data.numero_contacto.toString());
+        const storedRut = await AsyncStorage.getItem('usuarioRut');
+        if (storedRut) {
+          setRut(storedRut); // Establece el RUT en el estado
         } else {
-          Alert.alert('Error', 'No se pudo cargar la ficha médica.');
+          Alert.alert('Error', 'No se ha proporcionado un RUT válido.'); // Solo muestra la alerta si no hay un RUT
         }
       } catch (error) {
-        Alert.alert('Error', 'No se pudo cargar la ficha médica.');
+        console.error('Error al obtener el RUT del usuario:', error);
       }
     };
-
-    fetchData();
+  
+    obtenerRutUsuario();
+  
+    // Solo procede si el rut está disponible
+    if (rut) {
+      const fetchData = async () => {
+        try {
+          const baseUrl = Platform.OS === 'web'
+            ? CONFIG.apiBaseUrl.web
+            : Platform.OS === 'android'
+              ? CONFIG.apiBaseUrl.android
+              : CONFIG.apiBaseUrl.ios;
+  
+          const response = await fetch(`${baseUrl}/asodi/v1/fichas/${rut}/`);
+          const data = await response.json();
+          if (response.ok) {
+            setEdad(data.edad.toString());
+            setEstatura(data.estatura.toString());
+            setSexo(data.sexo);
+            setHospital(data.hospital_perteneciente);
+            setDiabetes(data.diabetes);
+            setHipertension(data.hipertension);
+            setEnfermedadCorazon(data.enfermedad_corazon);
+            setAccidenteVascular(data.accidente_vascular);
+            setTrombosis(data.trombosis);
+            setEpilepsia(data.epilepsia);
+            setAlergias(data.alergias);
+            setNumeroContacto(data.numero_contacto.toString());
+          } else {
+            Alert.alert('Error', 'No se pudo cargar la ficha médica.');
+          }
+        } catch (error) {
+          Alert.alert('Error', 'No se pudo cargar la ficha médica.');
+        }
+      };
+  
+      fetchData();
+    }
   }, [rut]);
-
+  
   const handleUpdateFicha = async () => {
     const baseUrl = Platform.OS === 'web'
       ? CONFIG.apiBaseUrl.web
@@ -116,6 +133,16 @@ const FichaMedicaDetalle = () => {
           </TouchableOpacity>
         </View>
 
+        {/* Campo de RUT con etiqueta */}
+        <Text style={styles.label}>RUT</Text>
+        <TextInput
+          style={styles.input}
+          value={rut}
+          editable={false}
+        />
+
+        {/* Campo de Edad con etiqueta */}
+        <Text style={styles.label}>Edad</Text>
         <TextInput
           style={styles.input}
           placeholder="Edad"
@@ -125,6 +152,8 @@ const FichaMedicaDetalle = () => {
           editable={editable}
         />
 
+        {/* Campo de Estatura con etiqueta */}
+        <Text style={styles.label}>Estatura (m)</Text>
         <TextInput
           style={styles.input}
           placeholder="Estatura (m)"
@@ -134,8 +163,9 @@ const FichaMedicaDetalle = () => {
           editable={editable}
         />
 
+        {/* Campo de Sexo con etiqueta */}
+        <Text style={styles.label}>Sexo</Text>
         <View style={styles.pickerContainer}>
-          <Text style={styles.label}>Sexo</Text>
           <Picker
             selectedValue={sexo}
             style={styles.picker}
@@ -148,6 +178,8 @@ const FichaMedicaDetalle = () => {
           </Picker>
         </View>
 
+        {/* Campo de Hospital Perteneciente con etiqueta */}
+        <Text style={styles.label}>Hospital Perteneciente</Text>
         <TextInput
           style={styles.input}
           placeholder="Hospital Perteneciente"
@@ -156,8 +188,81 @@ const FichaMedicaDetalle = () => {
           editable={editable}
         />
 
-        {/* Añade aquí los otros campos igual que en el formulario original */}
-        
+        {/* Campos booleanos */}
+        <View style={styles.switchContainer}>
+          <Text style={styles.label}>Diabetes</Text>
+          <Switch
+            value={diabetes}
+            onValueChange={setDiabetes}
+            disabled={!editable}
+          />
+        </View>
+
+        <View style={styles.switchContainer}>
+          <Text style={styles.label}>Hipertensión</Text>
+          <Switch
+            value={hipertension}
+            onValueChange={setHipertension}
+            disabled={!editable}
+          />
+        </View>
+
+        <View style={styles.switchContainer}>
+          <Text style={styles.label}>Enfermedad del Corazón</Text>
+          <Switch
+            value={enfermedadCorazon}
+            onValueChange={setEnfermedadCorazon}
+            disabled={!editable}
+          />
+        </View>
+
+        <View style={styles.switchContainer}>
+          <Text style={styles.label}>Accidente Vascular</Text>
+          <Switch
+            value={accidenteVascular}
+            onValueChange={setAccidenteVascular}
+            disabled={!editable}
+          />
+        </View>
+
+        <View style={styles.switchContainer}>
+          <Text style={styles.label}>Trombosis</Text>
+          <Switch
+            value={trombosis}
+            onValueChange={setTrombosis}
+            disabled={!editable}
+          />
+        </View>
+
+        <View style={styles.switchContainer}>
+          <Text style={styles.label}>Epilepsia</Text>
+          <Switch
+            value={epilepsia}
+            onValueChange={setEpilepsia}
+            disabled={!editable}
+          />
+        </View>
+
+        <View style={styles.switchContainer}>
+          <Text style={styles.label}>Alergias</Text>
+          <Switch
+            value={alergias}
+            onValueChange={setAlergias}
+            disabled={!editable}
+          />
+        </View>
+
+        {/* Campo de Número de Contacto con etiqueta */}
+        <Text style={styles.label}>Número de Contacto</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Número de Contacto"
+          keyboardType="numeric"
+          onChangeText={setNumeroContacto}
+          value={numeroContacto}
+          editable={editable}
+        />
+
         {editable && (
           <TouchableOpacity style={styles.saveButton} onPress={handleUpdateFicha}>
             <Text style={styles.saveButtonText}>Guardar Cambios</Text>
@@ -188,6 +293,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
   },
+  label: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 5,
+  },
   input: {
     height: 50,
     borderColor: '#ccc',
@@ -200,17 +310,18 @@ const styles = StyleSheet.create({
   pickerContainer: {
     marginBottom: 15,
   },
-  label: {
-    fontSize: 18,
-    color: '#333',
-    marginBottom: 5,
-  },
   picker: {
     height: 50,
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 5,
     backgroundColor: '#fff',
+  },
+  switchContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 15,
   },
   saveButton: {
     backgroundColor: '#1E90FF',
