@@ -17,6 +17,7 @@ import FichaMedica from './components/FichaMedica';
 import PesoPresionChart from './components/PesoPresionChart';
 import RegistrarPresion from './components/RegistrarPresion';
 import RegistrarPeso from './components/RegistrarPeso';
+import FichaMedicaDetalle from './components/FichaMedicaDetalle';
 
 // Declaraciones de navegadores
 const Stack = createStackNavigator();
@@ -75,9 +76,10 @@ function AuthStackNavigator({ onLogin }) {
       />
       <Stack.Screen 
         name="FichaMedica" 
-        component={FichaMedica} 
         options={{ headerShown: false }}
-      />
+      >
+        {(props) => <FichaMedica {...props} onLogin={onLogin} />}
+      </Stack.Screen>
     </Stack.Navigator>
   );
 }
@@ -93,6 +95,11 @@ function MainDrawerNavigator({ onLogout }) {
         name="Home" 
         component={HomeTabs} 
         options={{ drawerLabel: 'Inicio' }} // Aquí mantiene el nombre en el menú lateral
+      />
+      <Drawer.Screen 
+        name="FichaMedicaDetalle" 
+        component={FichaMedicaDetalle} 
+        options={{ drawerLabel: 'Ficha' }} // Aquí mantiene el nombre en el menú lateral
       />
       <Drawer.Screen 
         name="RegistrarPresion" 

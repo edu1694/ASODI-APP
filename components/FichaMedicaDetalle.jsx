@@ -1,26 +1,17 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView, Platform } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Platform } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Picker } from '@react-native-picker/picker'; 
 import Icon from 'react-native-vector-icons/Ionicons';
 import CONFIG from '../lib/config';
 
-const CustomCheckbox = ({ value, onValueChange }) => {
-  return (
-    <TouchableOpacity
-      onPress={() => onValueChange(!value)}
-      style={[styles.checkbox, value && styles.checkboxChecked]}
-    >
-      {value && <Icon name="checkmark" size={20} color="white" />}
-    </TouchableOpacity>
-  );
-};
+const FichaMedicaDetalle = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const { rut } = route.params;
 
-const FichaMedica = (props) => {
-  const route = useRoute(); 
-  const { rut } = route.params; 
-
+  const [editable, setEditable] = useState(false); // Para alternar entre vista y edición
   const [edad, setEdad] = useState('');
   const [estatura, setEstatura] = useState('');
   const [sexo, setSexo] = useState('');
@@ -34,21 +25,43 @@ const FichaMedica = (props) => {
   const [alergias, setAlergias] = useState(false);
   const [numeroContacto, setNumeroContacto] = useState('');
 
-  const handleSaveFicha = async () => {
-    if (!edad || !estatura || !sexo || !hospital || !numeroContacto) {
-      Alert.alert('Error', 'Por favor, completa todos los campos obligatorios.');
-      return;
-    }
+  useEffect(() => {
+    // Aquí puedes cargar los datos de la ficha médica existente para el usuario con RUT.
+    const fetchData = async () => {
+      try {
+        const baseUrl = Platform.OS === 'web'
+          ? CONFIG.apiBaseUrl.web
+          : Platform.OS === 'android'
+            ? CONFIG.apiBaseUrl.android
+            : CONFIG.apiBaseUrl.ios;
 
-    const edadParsed = parseInt(edad);
-    const estaturaParsed = parseFloat(estatura);
-    const numeroContactoParsed = parseInt(numeroContacto);
+        const response = await fetch(`${baseUrl}/asodi/v1/fichas/${rut}/`);
+        const data = await response.json();
+        if (response.ok) {
+          setEdad(data.edad.toString());
+          setEstatura(data.estatura.toString());
+          setSexo(data.sexo);
+          setHospital(data.hospital_perteneciente);
+          setDiabetes(data.diabetes);
+          setHipertension(data.hipertension);
+          setEnfermedadCorazon(data.enfermedad_corazon);
+          setAccidenteVascular(data.accidente_vascular);
+          setTrombosis(data.trombosis);
+          setEpilepsia(data.epilepsia);
+          setAlergias(data.alergias);
+          setNumeroContacto(data.numero_contacto.toString());
+        } else {
+          Alert.alert('Error', 'No se pudo cargar la ficha médica.');
+        }
+      } catch (error) {
+        Alert.alert('Error', 'No se pudo cargar la ficha médica.');
+      }
+    };
 
-    if (isNaN(edadParsed) || isNaN(estaturaParsed) || isNaN(numeroContactoParsed)) {
-      Alert.alert('Error', 'Por favor, ingresa valores válidos en los campos numéricos.');
-      return;
-    }
+    fetchData();
+  }, [rut]);
 
+  const handleUpdateFicha = async () => {
     const baseUrl = Platform.OS === 'web'
       ? CONFIG.apiBaseUrl.web
       : Platform.OS === 'android'
@@ -56,8 +69,8 @@ const FichaMedica = (props) => {
         : CONFIG.apiBaseUrl.ios;
 
     const fichaData = {
-      edad: edadParsed,
-      estatura: estaturaParsed,
+      edad: parseInt(edad),
+      estatura: parseFloat(estatura),
       sexo,
       hospital_perteneciente: hospital,
       diabetes,
@@ -67,13 +80,13 @@ const FichaMedica = (props) => {
       trombosis,
       epilepsia,
       alergias,
-      numero_contacto: numeroContactoParsed,
-      usuario: rut 
+      numero_contacto: parseInt(numeroContacto),
+      usuario: rut
     };
 
     try {
-      const response = await fetch(`${baseUrl}/asodi/v1/fichas/`, {
-        method: 'POST',
+      const response = await fetch(`${baseUrl}/asodi/v1/fichas/${rut}/`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -83,22 +96,25 @@ const FichaMedica = (props) => {
       const data = await response.json();
 
       if (response.ok) {
-        Alert.alert('Éxito', 'Ficha médica guardada exitosamente.');
-        props.onLogin()
+        Alert.alert('Éxito', 'Ficha médica actualizada exitosamente.');
+        setEditable(false); // Salir del modo de edición
       } else {
-        console.error('Error al guardar la ficha médica:', data);
-        Alert.alert('Error', `Error al guardar la ficha médica: ${data.message || 'Error desconocido'}`);
+        Alert.alert('Error', `Error al actualizar la ficha médica: ${data.message || 'Error desconocido'}`);
       }
     } catch (error) {
-      console.error('Error:', error);
-      Alert.alert('Error', 'No se pudo guardar la ficha médica');
+      Alert.alert('Error', 'No se pudo actualizar la ficha médica');
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.title}>Ficha Médica</Text>
+        <View style={styles.header}>
+          <Text style={styles.title}>Ficha Médica</Text>
+          <TouchableOpacity onPress={() => setEditable(!editable)}>
+            <Icon name="pencil" size={24} color="black" />
+          </TouchableOpacity>
+        </View>
 
         <TextInput
           style={styles.input}
@@ -106,6 +122,7 @@ const FichaMedica = (props) => {
           keyboardType="numeric"
           onChangeText={setEdad}
           value={edad}
+          editable={editable}
         />
 
         <TextInput
@@ -114,6 +131,7 @@ const FichaMedica = (props) => {
           keyboardType="numeric"
           onChangeText={setEstatura}
           value={estatura}
+          editable={editable}
         />
 
         <View style={styles.pickerContainer}>
@@ -122,6 +140,7 @@ const FichaMedica = (props) => {
             selectedValue={sexo}
             style={styles.picker}
             onValueChange={(itemValue) => setSexo(itemValue)}
+            enabled={editable}
           >
             <Picker.Item label="Selecciona tu sexo" value="" />
             <Picker.Item label="Hombre" value="M" />
@@ -134,34 +153,16 @@ const FichaMedica = (props) => {
           placeholder="Hospital Perteneciente"
           onChangeText={setHospital}
           value={hospital}
+          editable={editable}
         />
 
-        {[
-          { label: 'Diabetes', value: diabetes, onChange: setDiabetes },
-          { label: 'Hipertensión', value: hipertension, onChange: setHipertension },
-          { label: 'Enfermedad del corazón', value: enfermedadCorazon, onChange: setEnfermedadCorazon },
-          { label: 'Accidente vascular', value: accidenteVascular, onChange: setAccidenteVascular },
-          { label: 'Trombosis', value: trombosis, onChange: setTrombosis },
-          { label: 'Epilepsia', value: epilepsia, onChange: setEpilepsia },
-          { label: 'Alergias', value: alergias, onChange: setAlergias }
-        ].map((item, index) => (
-          <View key={index} style={styles.checkboxContainer}>
-            <Text style={styles.label}>{`¿Tienes ${item.label}?`}</Text>
-            <CustomCheckbox value={item.value} onValueChange={item.onChange} />
-          </View>
-        ))}
-
-        <TextInput
-          style={styles.input}
-          placeholder="Número de Contacto"
-          keyboardType="numeric"
-          onChangeText={setNumeroContacto}
-          value={numeroContacto}
-        />
-
-        <TouchableOpacity style={styles.saveButton} onPress={handleSaveFicha}>
-          <Text style={styles.saveButtonText}>Guardar Ficha Médica</Text>
-        </TouchableOpacity>
+        {/* Añade aquí los otros campos igual que en el formulario original */}
+        
+        {editable && (
+          <TouchableOpacity style={styles.saveButton} onPress={handleUpdateFicha}>
+            <Text style={styles.saveButtonText}>Guardar Cambios</Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -176,11 +177,15 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
   },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
     color: '#333',
   },
   input: {
@@ -207,25 +212,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: '#fff',
   },
-  checkboxContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  checkbox: {
-    height: 24,
-    width: 24,
-    borderWidth: 2,
-    borderColor: '#ccc',
-    borderRadius: 4,
-    backgroundColor: 'white',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  checkboxChecked: {
-    backgroundColor: '#1E90FF',
-  },
   saveButton: {
     backgroundColor: '#1E90FF',
     borderRadius: 25,
@@ -241,4 +227,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FichaMedica;
+export default FichaMedicaDetalle;
