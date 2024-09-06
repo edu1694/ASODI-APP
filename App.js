@@ -18,6 +18,7 @@ import PesoPresionChart from './components/PesoPresionChart';
 import RegistrarPresion from './components/RegistrarPresion';
 import RegistrarPeso from './components/RegistrarPeso';
 import FichaMedicaDetalle from './components/FichaMedicaDetalle';
+import Contacto from './components/Contacto';
 import RegistrarCitaMedica from './components/RegistrarCitaMedica';
 
 // Declaraciones de navegadores
@@ -38,7 +39,7 @@ function HomeTabs() {
             iconName = focused ? 'bar-chart' : 'bar-chart-outline';
           } else if (route.name === 'Principal') {
             iconName = focused ? 'home' : 'home-outline'; // Corregido a 'home' y 'home-outline'
-          } else if (route.name === 'Panel informativo') {
+          } else if (route.name === 'Contáctanos') {
             iconName = focused ? 'information-circle' : 'information-circle-outline';
           }
   
@@ -51,7 +52,7 @@ function HomeTabs() {
     >
       <Tab.Screen name="Resumen" component={PesoPresionChart} />
       <Tab.Screen name="Principal" component={Home} />
-      <Tab.Screen name="Panel informativo" component={RegistrarPresion} />
+      <Tab.Screen name="Contáctanos" component={Contacto} />
     </Tab.Navigator>
   );
 }
