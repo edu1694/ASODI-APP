@@ -158,7 +158,12 @@ const FichaMedicaDetalle = () => {
           style={styles.input}
           placeholder="Estatura (m)"
           keyboardType="numeric"
-          onChangeText={setEstatura}
+          onChangeText={(text) => {
+            const numericValue = text.replace(/[^0-9.]/g, ''); // Eliminar caracteres no numéricos excepto el punto
+            if (/^\d*\.?\d{0,2}$/.test(numericValue)) {
+              setEstatura(numericValue);
+            }
+          }}
           value={estatura}
           editable={editable}
         />
