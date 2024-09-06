@@ -19,6 +19,7 @@ import RegistrarPresion from './components/RegistrarPresion';
 import RegistrarPeso from './components/RegistrarPeso';
 import FichaMedicaDetalle from './components/FichaMedicaDetalle';
 import Contacto from './components/Contacto';
+import RegistrarCitaMedica from './components/RegistrarCitaMedica';
 
 // Declaraciones de navegadores
 const Stack = createStackNavigator();
@@ -106,6 +107,11 @@ function MainDrawerNavigator({ onLogout }) {
         name="FichaMedicaDetalle" 
         component={FichaMedicaDetalle} 
         options={{ drawerLabel: 'Ficha' }} // Aquí mantiene el nombre en el menú lateral
+      />
+      <Drawer.Screen 
+        name="RegistrarCitaMedica" 
+        component={RegistrarCitaMedica} 
+        options={{ drawerLabel: 'Registrar Cita Medica' }} // Mantén el nombre en el menú lateral
       />
       <Drawer.Screen 
         name="RegistrarPresion" 
