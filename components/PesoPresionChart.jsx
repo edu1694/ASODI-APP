@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   View, 
   Text, 
@@ -14,6 +14,7 @@ import { BarChart } from 'react-native-chart-kit';
 import moment from 'moment';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker'; 
+import { useFocusEffect } from '@react-navigation/native'; // Importa el hook useFocusEffect
 import CONFIG from '../lib/config';
 
 const screenWidth = Dimensions.get('window').width;
@@ -35,22 +36,25 @@ const PesoPresionChart = () => {
       ? CONFIG.apiBaseUrl.android
       : CONFIG.apiBaseUrl.ios;
 
-  useEffect(() => {
-    const obtenerRutUsuario = async () => {
-      try {
-        const rut = await AsyncStorage.getItem('usuarioRut');
-        if (rut !== null) {
-          setUsuarioRut(rut);
-          obtenerDatosPeso(rut);
-          obtenerDatosPresion(rut);
+  // Hook para obtener datos cuando la pestaña de Resumen está en foco
+  useFocusEffect(
+    useCallback(() => {
+      const obtenerRutUsuario = async () => {
+        try {
+          const rut = await AsyncStorage.getItem('usuarioRut');
+          if (rut !== null) {
+            setUsuarioRut(rut);
+            obtenerDatosPeso(rut);
+            obtenerDatosPresion(rut);
+          }
+        } catch (error) {
+          console.error('Error al obtener el RUT del usuario:', error);
         }
-      } catch (error) {
-        console.error('Error al obtener el RUT del usuario:', error);
-      }
-    };
+      };
 
-    obtenerRutUsuario();
-  }, []);
+      obtenerRutUsuario();
+    }, [])
+  );
 
   const obtenerDatosPeso = async (rut) => {
     try {

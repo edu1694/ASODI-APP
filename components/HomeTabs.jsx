@@ -1,13 +1,25 @@
-import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'; // Importa el Tab Navigator
-import { Ionicons } from '@expo/vector-icons'; // Para los íconos
-import PesoPresionChart from './components/PesoPresionChart';
-import Home from './components/Home';
-import RegistrarPresion from './components/RegistrarPresion';
+import React, { useCallback } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { Tab } from 'react-native-paper'; // O el componente Tab de react-navigation
+import { useFocusEffect } from '@react-navigation/native';
 
-const Tab = createBottomTabNavigator(); // Crea el Tab Navigator
+function PesoPresionChart() {
+  useFocusEffect(
+    useCallback(() => {
+      // Lógica para actualizar los datos o realizar alguna acción
+      console.log("La pestaña Resumen está en foco. Actualizando datos...");
+      // Aquí puedes hacer una llamada a tu API o actualizar el estado
+    }, [])
+  );
 
-// Función que define el Tab Navigator con las secciones "Resumen", "Principal" y "Panel Informativo"
+  return (
+    // Tu componente de resumen aquí
+    <View>
+      {/* El contenido de la pestaña Resumen */}
+    </View>
+  );
+}
+
 function HomeTabs() {
   return (
     <Tab.Navigator
@@ -23,12 +35,11 @@ function HomeTabs() {
             iconName = focused ? 'information-circle' : 'information-circle-outline';
           }
 
-          // Devuelve el ícono adecuado basado en la pestaña activa
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: '#333',
         tabBarInactiveTintColor: 'gray',
-        headerShown: false, // No mostrar el header dentro de las pestañas
+        headerShown: false,
       })}
     >
       <Tab.Screen name="Resumen" component={PesoPresionChart} />
