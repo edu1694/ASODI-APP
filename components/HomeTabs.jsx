@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'; // Imp
 import { Ionicons } from '@expo/vector-icons'; // Para los íconos
 import PesoPresionChart from './components/PesoPresionChart';
 import Home from './components/Home';
-import RegistrarPresion from './components/RegistrarPresion';
+import Contacto from './Contacto';
 
 const Tab = createBottomTabNavigator(); // Crea el Tab Navigator
 
@@ -19,7 +19,7 @@ function HomeTabs() {
             iconName = focused ? 'bar-chart' : 'bar-chart-outline';
           } else if (route.name === 'Principal') {
             iconName = focused ? 'home' : 'home-outline';
-          } else if (route.name === 'Panel informativo') {
+          } else if (route.name === 'Contáctanos') {
             iconName = focused ? 'information-circle' : 'information-circle-outline';
           }
 
@@ -33,7 +33,7 @@ function HomeTabs() {
     >
       <Tab.Screen name="Resumen" component={PesoPresionChart} />
       <Tab.Screen name="Principal" component={Home} />
-      <Tab.Screen name="Panel informativo" component={RegistrarPresion} />
+      <Tab.Screen name="Contáctanos" component={Contacto} />
     </Tab.Navigator>
   );
 }
