@@ -7,14 +7,13 @@ import {
   StyleSheet, 
   Text,
   ScrollView,
-  Platform,
   TouchableOpacity
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native'; 
 import { SafeAreaView } from 'react-native-safe-area-context'; 
 import Icon from 'react-native-vector-icons/Ionicons'; 
-import CONFIG from '../lib/config';
+import baseUrl from '../lib/config';
 
 
 const Login = (props) => {
@@ -28,12 +27,6 @@ const Login = (props) => {
       Alert.alert('Error', 'Por favor, ingresa tu correo y contraseña');
       return;
     }
-  
-    const baseUrl = Platform.OS === 'web'
-      ? CONFIG.apiBaseUrl.web
-      : Platform.OS === 'android'
-        ? CONFIG.apiBaseUrl.android
-        : CONFIG.apiBaseUrl.ios;
   
     try {
       const response = await fetch(`${baseUrl}/asodi/v1/usuarios/`, {

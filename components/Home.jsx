@@ -4,11 +4,10 @@ import {
   Text, 
   StyleSheet, 
   SafeAreaView,
-  Platform 
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import CONFIG from '../lib/config';
+import baseUrl from '../lib/config';
 
 const Home = () => {
   const [usuarioRut, setUsuarioRut] = useState('');
@@ -40,12 +39,6 @@ const Home = () => {
   );
 
   const obtenerDatosUsuario = async (rut) => {
-    const baseUrl = Platform.OS === 'web'
-      ? CONFIG.apiBaseUrl.web
-      : Platform.OS === 'android'
-        ? CONFIG.apiBaseUrl.android
-        : CONFIG.apiBaseUrl.ios;
-
     try {
       const response = await fetch(`${baseUrl}/asodi/v1/usuarios/${rut}`, {
         method: 'GET',

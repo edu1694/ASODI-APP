@@ -7,7 +7,6 @@ import {
   StyleSheet, 
   Dimensions,
   Alert,
-  Platform,
   ScrollView
 } from 'react-native';
 import { BarChart } from 'react-native-chart-kit';
@@ -15,7 +14,7 @@ import moment from 'moment';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker'; 
 import { useFocusEffect } from '@react-navigation/native'; // Importa el hook useFocusEffect
-import CONFIG from '../lib/config';
+import baseUrl from '../lib/config';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -30,12 +29,6 @@ const PesoPresionChart = () => {
   const [selectedYearPeso, setSelectedYearPeso] = useState(new Date().getFullYear());
   const currentYear = new Date().getFullYear(); 
   const [usuarioRut, setUsuarioRut] = useState('');
-  const baseUrl = Platform.OS === 'web'
-    ? CONFIG.apiBaseUrl.web
-    : Platform.OS === 'android'
-      ? CONFIG.apiBaseUrl.android
-      : CONFIG.apiBaseUrl.ios;
-
   // Hook para obtener datos cuando la pestaña de Resumen está en foco
   useFocusEffect(
     useCallback(() => {

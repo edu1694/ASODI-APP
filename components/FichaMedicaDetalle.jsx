@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Platform, Switch } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Switch } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Picker } from '@react-native-picker/picker'; 
 import Icon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import CONFIG from '../lib/config';
+import baseUrl from '../lib/config';
 
 const FichaMedicaDetalle = () => {
   const route = useRoute();
@@ -45,11 +45,6 @@ const FichaMedicaDetalle = () => {
     if (rut) {
       const fetchData = async () => {
         try {
-          const baseUrl = Platform.OS === 'web'
-            ? CONFIG.apiBaseUrl.web
-            : Platform.OS === 'android'
-              ? CONFIG.apiBaseUrl.android
-              : CONFIG.apiBaseUrl.ios;
   
           const response = await fetch(`${baseUrl}/asodi/v1/fichas/${rut}/`);
           const data = await response.json();
@@ -79,12 +74,6 @@ const FichaMedicaDetalle = () => {
   }, [rut]);
   
   const handleUpdateFicha = async () => {
-    const baseUrl = Platform.OS === 'web'
-      ? CONFIG.apiBaseUrl.web
-      : Platform.OS === 'android'
-        ? CONFIG.apiBaseUrl.android
-        : CONFIG.apiBaseUrl.ios;
-
     const fichaData = {
       edad: parseInt(edad),
       estatura: parseFloat(estatura),

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, Alert, StyleSheet, ScrollView, Platform } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, Alert, StyleSheet, ScrollView} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native'; 
-import CONFIG from '../lib/config'; // Asume que tienes una configuración global para la API
+import baseUrl from '../lib/config';
 
 const RecPassword = () => {
   const [correo, setCorreo] = useState('');
@@ -16,13 +16,6 @@ const RecPassword = () => {
     }
 
     setIsLoading(true); // Para mostrar un indicador de carga, si es necesario
-
-    const baseUrl = Platform.OS === 'web'
-      ? CONFIG.apiBaseUrl.web
-      : Platform.OS === 'android'
-        ? CONFIG.apiBaseUrl.android
-        : CONFIG.apiBaseUrl.ios;
-
     try {
       const response = await fetch(`${baseUrl}/api/password_reset/`, {  // Cambia el endpoint aquí
         method: 'POST',

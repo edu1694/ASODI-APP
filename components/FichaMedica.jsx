@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView, Platform } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView} from 'react-native';
+import { useRoute } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Picker } from '@react-native-picker/picker'; 
 import Icon from 'react-native-vector-icons/Ionicons';
-import CONFIG from '../lib/config';
+import baseUrl from '../lib/config';
 
 const CustomCheckbox = ({ value, onValueChange }) => {
   return (
@@ -48,13 +48,7 @@ const FichaMedica = (props) => {
       Alert.alert('Error', 'Por favor, ingresa valores válidos en los campos numéricos.');
       return;
     }
-
-    const baseUrl = Platform.OS === 'web'
-      ? CONFIG.apiBaseUrl.web
-      : Platform.OS === 'android'
-        ? CONFIG.apiBaseUrl.android
-        : CONFIG.apiBaseUrl.ios;
-
+    
     const fichaData = {
       edad: edadParsed,
       estatura: estaturaParsed,
