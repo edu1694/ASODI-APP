@@ -10,12 +10,11 @@ import {
   SafeAreaView,
   StatusBar,
   Keyboard,
-  Platform
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Ionicons';
-import CONFIG from '../lib/config';
+import baseUrl from '../lib/config';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const RegistrarPresion = () => {
@@ -27,13 +26,6 @@ const RegistrarPresion = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [usuarioRut, setUsuarioRut] = useState('');
   const insets = useSafeAreaInsets();
-
-  // Definir la baseUrl antes de usarla
-  const baseUrl = Platform.OS === 'web'
-    ? CONFIG.apiBaseUrl.web
-    : Platform.OS === 'android'
-      ? CONFIG.apiBaseUrl.android
-      : CONFIG.apiBaseUrl.ios;
 
   useEffect(() => {
     const obtenerRutUsuario = async () => {

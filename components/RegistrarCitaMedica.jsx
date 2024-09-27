@@ -10,12 +10,11 @@ import {
   SafeAreaView,
   StatusBar,
   Keyboard,
-  Platform
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Ionicons';
-import CONFIG from '../lib/config';
+import baseUrl from '../lib/config';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const RegistrarCitaMedica = () => {
@@ -98,12 +97,6 @@ const RegistrarCitaMedica = () => {
     setNombreMedico('');
     setMotivoConsulta('');
   };
-
-  const baseUrl = Platform.OS === 'web'
-      ? CONFIG.apiBaseUrl.web
-      : Platform.OS === 'android'
-        ? CONFIG.apiBaseUrl.android
-        : CONFIG.apiBaseUrl.ios;
 
   const obtenerCitasMedicas = async (rut) => {
     try {

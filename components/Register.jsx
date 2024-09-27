@@ -7,13 +7,12 @@ import {
   Text, 
   TouchableOpacity, 
   ScrollView, 
-  Platform 
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/Ionicons'; // Importar ícono
 import { useNavigation } from '@react-navigation/native';
-import CONFIG from '../lib/config';
+import baseUrl from '../lib/config';
 
 // Función para formatear el RUT
 const formatRut = (rut) => {
@@ -63,12 +62,6 @@ const Register = () => {
       correo,
       password,
     };
-
-    const baseUrl = Platform.OS === 'web'
-      ? CONFIG.apiBaseUrl.web
-      : Platform.OS === 'android'
-        ? CONFIG.apiBaseUrl.android
-        : CONFIG.apiBaseUrl.ios;
 
     try {
       // Enviar datos a la API con una solicitud POST
