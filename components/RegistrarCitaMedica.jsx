@@ -3,7 +3,6 @@ import {
   View, 
   TextInput, 
   Alert, 
-  StyleSheet, 
   Text,
   TouchableOpacity,
   FlatList,
@@ -15,7 +14,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Ionicons';
 import baseUrl from '../lib/config';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import tw from 'tailwind-react-native-classnames';
 
 const RegistrarCitaMedica = () => {
   const [fecha, setFecha] = useState(new Date());
@@ -26,7 +25,6 @@ const RegistrarCitaMedica = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [usuarioRut, setUsuarioRut] = useState('');
-  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     const obtenerRutUsuario = async () => {
@@ -70,7 +68,7 @@ const RegistrarCitaMedica = () => {
       hora: hora.toTimeString().split(' ')[0],
       nombre_medico: nombreMedico,
       motivo_consulta: motivoConsulta,
-      usuario: usuarioRut,  // Usamos el RUT guardado
+      usuario: usuarioRut,
     };
 
     try {
@@ -140,40 +138,38 @@ const RegistrarCitaMedica = () => {
   };
 
   const renderItem = ({ item }) => (
-    <View style={styles.citaItem}>
-      <View style={styles.citaInfo}>
-        <Text style={styles.citaText}>Fecha: {item.fecha}</Text>
-        <Text style={styles.citaText}>Hora: {item.hora}</Text>
-        <Text style={styles.citaText}>Médico: {item.nombre_medico}</Text>
-        <Text style={styles.citaText}>Motivo: {item.motivo_consulta}</Text>
+    <View style={[tw`p-4 mb-3 rounded-lg flex-row justify-between items-center shadow`, { backgroundColor: '#e8f5e9' }]}>
+      <View>
+        <Text style={[tw`text-lg`, { color: '#388e3c' }]}>Fecha: {item.fecha}</Text>
+        <Text style={[tw`text-lg`, { color: '#388e3c' }]}>Hora: {item.hora}</Text>
+        <Text style={[tw`text-lg`, { color: '#388e3c' }]}>Médico: {item.nombre_medico}</Text>
+        <Text style={[tw`text-lg`, { color: '#388e3c' }]}>Motivo: {item.motivo_consulta}</Text>
       </View>
       <TouchableOpacity onPress={() => eliminarCitaMedica(item.id_cita_medica)}>
-        <Icon name="trash-outline" size={24} color="red" />
+        <Icon name="trash-outline" size={24} color="#d32f2f" />
       </TouchableOpacity>
     </View>
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar style='light'/>
+    <SafeAreaView style={[tw`flex-1 px-4`, { backgroundColor: '#f0f4f8' }]}>
+      <StatusBar barStyle='dark-content' />
 
       <View>
-        <View style={styles.dateInputContainer}>
+        <Text style={[tw`text-2xl font-bold text-center mb-5`, { color: '#388e3c' }]}>Registrar Cita Medica</Text>
+        <View style={[tw`flex-row items-center border bg-white rounded-lg p-3 mb-4`, { borderColor: '#388e3c' }]}>
           <TouchableOpacity 
-            style={styles.dateInput}
+            style={tw`flex-1`}
             onPress={() => {
-              Keyboard.dismiss(); // Cerrar el teclado antes de mostrar el DatePicker
+              Keyboard.dismiss(); 
               setShowDatePicker(true);
             }}
           >
-            <Text style={styles.dateText}>
+            <Text style={[tw`text-lg`, { color: '#388e3c' }]}>
               {fecha ? fecha.toLocaleDateString('es-ES') : 'DD-MM-AAAA'}
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => {
-            Keyboard.dismiss();
-            setShowDatePicker(true);
-          }}>
+          <TouchableOpacity onPress={() => setShowDatePicker(true)}>
             <Icon name="calendar-outline" size={24} color="gray" />
           </TouchableOpacity>
         </View>
@@ -188,22 +184,19 @@ const RegistrarCitaMedica = () => {
           />
         )}
 
-        <View style={styles.dateInputContainer}>
+        <View style={[tw`flex-row items-center border bg-white rounded-lg p-3 mb-4`, { borderColor: '#388e3c' }]}>
           <TouchableOpacity 
-            style={styles.dateInput}
+            style={tw`flex-1`}
             onPress={() => {
               Keyboard.dismiss();
               setShowTimePicker(true);
             }}
           >
-            <Text style={styles.dateText}>
+            <Text style={[tw`text-lg`, { color: '#388e3c' }]}>
               {hora ? hora.toLocaleTimeString('es-ES') : 'HH:MM:SS'}
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => {
-            Keyboard.dismiss();
-            setShowTimePicker(true);
-          }}>
+          <TouchableOpacity onPress={() => setShowTimePicker(true)}>
             <Icon name="time-outline" size={24} color="gray" />
           </TouchableOpacity>
         </View>
@@ -219,122 +212,36 @@ const RegistrarCitaMedica = () => {
         )}
 
         <TextInput
-          style={styles.input}
+          style={[tw`bg-white p-4 mb-4 rounded-lg shadow`, { borderColor: '#388e3c' }]}
           placeholder="Nombre del Médico"
           onChangeText={text => setNombreMedico(text)}
           value={nombreMedico}
         />
         <TextInput
-          style={styles.input}
+          style={[tw`bg-white p-4 mb-4 rounded-lg shadow`, { borderColor: '#388e3c' }]}
           placeholder="Motivo de la Consulta"
           onChangeText={text => setMotivoConsulta(text)}
           value={motivoConsulta}
         />
 
         <TouchableOpacity 
-          style={styles.citaButton} 
+          style={[tw`bg-green-500 p-4 rounded-lg justify-center items-center`, { backgroundColor: '#388e3c' }]}
           onPress={crearCitaMedica}
         >
-          <Text style={styles.citaButtonText}>Crear Cita Médica</Text>
+          <Text style={tw`text-white text-lg font-bold`}>Crear Cita Médica</Text>
         </TouchableOpacity>
 
-        <Text style={styles.subtitle}>Citas Médicas Registradas</Text>
+        <Text style={[tw`text-xl font-bold text-center mt-8 mb-4`, { color: '#388e3c' }]}>Citas Médicas Registradas</Text>
       </View>
 
       <FlatList
         data={citas}
         renderItem={renderItem}
         keyExtractor={item => item.id_cita_medica.toString()}
-        contentContainerStyle={styles.citasContainer}
+        contentContainerStyle={tw`pt-4 pb-20`}
       />
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 15,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-    color: '#333',
-  },
-  subtitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginVertical: 20,
-    textAlign: 'center',
-    color: '#333',
-  },
-  dateInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 15,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    height: 50,
-    backgroundColor: '#fff',
-  },
-  dateInput: {
-    flex: 1,
-  },
-  dateText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  input: {
-    height: 50,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 15,
-    backgroundColor: '#fff',
-  },
-  citaButton: {
-    backgroundColor: '#32CD32',
-    borderRadius: 25,
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  citaButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  citasContainer: {
-    marginTop: 20,
-  },
-  citaItem: {
-    backgroundColor: '#f9f9f9',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 3,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  citaInfo: {
-    flex: 1,
-  },
-  citaText: {
-    fontSize: 16,
-    color: '#333',
-  },
-});
 
 export default RegistrarCitaMedica;

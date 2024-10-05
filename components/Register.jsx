@@ -2,29 +2,23 @@ import React, { useState } from 'react';
 import { 
   View, 
   TextInput, 
-  Alert, 
-  StyleSheet, 
   Text, 
   TouchableOpacity, 
   ScrollView, 
+  Modal 
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import Icon from 'react-native-vector-icons/Ionicons'; // Importar ícono
+import Icon from 'react-native-vector-icons/Ionicons'; 
 import { useNavigation } from '@react-navigation/native';
+import tw from 'tailwind-react-native-classnames';
 import baseUrl from '../lib/config';
 
-// Función para formatear el RUT
 const formatRut = (rut) => {
-  // Eliminar caracteres no numéricos
   const cleaned = rut.replace(/[^\dKk]/g, '');
-  // Si el RUT está vacío, devolver vacío
   if (cleaned === '') return '';
-  // Extraer el dígito verificador
   const dv = cleaned.slice(-1).toUpperCase();
-  // Extraer el número
   const number = cleaned.slice(0, -1);
-  // Formatear el número en el formato XX.XXX.XXX
   const formattedNumber = number.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   return `${formattedNumber}-${dv}`;
 };
@@ -33,44 +27,40 @@ const Register = () => {
   const [rut, setRut] = useState('');
   const [nombre, setNombre] = useState('');
   const [apellido, setApellido] = useState('');
-  const [fechaNacimiento, setFechaNacimiento] = useState(null); // Comenzar con null
+  const [fechaNacimiento, setFechaNacimiento] = useState(null); 
   const [correo, setCorreo] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
   const navigation = useNavigation();
 
   const manejarRegistro = async () => {
-    // Validar que todos los campos estén completos
     if (!rut || !nombre || !apellido || !correo || !password || !confirmPassword || !fechaNacimiento) {
-      Alert.alert('Error', 'Por favor, completa todos los campos');
+      setShowErrorModal(true); // Mostrar modal de error si faltan datos
       return;
     }
-
-    // Validar que las contraseñas coincidan
     if (password !== confirmPassword) {
-      Alert.alert('Error', 'Las contraseñas no coinciden');
+      setShowErrorModal(true); // Mostrar modal de error si las contraseñas no coinciden
       return;
     }
 
-    // Estructura de los datos a enviar
     const nuevoUsuario = {
-      rut: formatRut(rut), // Mantén el formato con puntos y guiones
+      rut: formatRut(rut),
       nombre,
       apellido,
-      fecha_nacimiento: fechaNacimiento.toISOString().split('T')[0], // Convertir la fecha a formato YYYY-MM-DD
+      fecha_nacimiento: fechaNacimiento.toISOString().split('T')[0], 
       correo,
       password,
     };
 
     try {
-      // Enviar datos a la API con una solicitud POST
       const response = await fetch(`${baseUrl}/asodi/v1/usuarios/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(nuevoUsuario), // Convertir el objeto a JSON
+        body: JSON.stringify(nuevoUsuario),
       });
 
       if (!response.ok) {
@@ -78,51 +68,50 @@ const Register = () => {
       }
 
       const data = await response.json();
-      Alert.alert('Éxito', 'Usuario registrado con éxito');
-      navigation.navigate('Login'); // Navegar al login después del registro
+      navigation.navigate('Login');
     } catch (error) {
       console.error('Error en el registro:', error);
-      Alert.alert('Error', 'No se pudo registrar el usuario');
+      setShowErrorModal(true); // Mostrar modal de error si ocurre un problema
     }
   };
 
   const onChangeDate = (event, selectedDate) => {
     const currentDate = selectedDate || fechaNacimiento;
-    setShowDatePicker(false); // Ocultar el picker una vez que se selecciona la fecha
+    setShowDatePicker(false);
     setFechaNacimiento(currentDate);
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.title}>Registrar Usuario</Text>
+    <SafeAreaView style={tw`flex-1 bg-gray-100`}>
+      <ScrollView contentContainerStyle={tw`flex-grow justify-center px-5`}>
+        <Text style={tw`text-3xl font-bold text-center text-green-700 mb-8`}>Registrar Usuario</Text>
 
         <TextInput
-          style={styles.input}
+          style={tw`h-12 border border-gray-300 rounded-lg px-4 mb-4 bg-white`}
           placeholder="RUT"
           value={formatRut(rut)}
           onChangeText={text => setRut(text)}
         />
         <TextInput
-          style={styles.input}
+          style={tw`h-12 border border-gray-300 rounded-lg px-4 mb-4 bg-white`}
           placeholder="Nombre"
           value={nombre}
           onChangeText={setNombre}
         />
         <TextInput
-          style={styles.input}
+          style={tw`h-12 border border-gray-300 rounded-lg px-4 mb-4 bg-white`}
           placeholder="Apellido"
           value={apellido}
           onChangeText={setApellido}
         />
         
         {/* Selector de fecha con ícono de calendario */}
-        <View style={styles.dateInputContainer}>
+        <View style={tw`flex-row items-center border border-gray-300 rounded-lg px-4 mb-4 bg-white`}>
           <TouchableOpacity 
-            style={styles.dateInput}
+            style={tw`flex-1 justify-center h-12`}
             onPress={() => setShowDatePicker(true)}
           >
-            <Text style={styles.dateText}>
+            <Text style={tw`text-gray-700`}>
               {fechaNacimiento ? fechaNacimiento.toLocaleDateString('es-ES') : 'DD-MM-AAAA'}
             </Text>
           </TouchableOpacity>
@@ -142,93 +131,59 @@ const Register = () => {
         )}
 
         <TextInput
-          style={styles.input}
+          style={tw`h-12 border border-gray-300 rounded-lg px-4 mb-4 bg-white`}
           placeholder="Correo"
           keyboardType="email-address"
           value={correo}
           onChangeText={setCorreo}
         />
         <TextInput
-          style={styles.input}
+          style={tw`h-12 border border-gray-300 rounded-lg px-4 mb-4 bg-white`}
           placeholder="Contraseña"
           secureTextEntry={true}
           value={password}
           onChangeText={setPassword}
         />
         <TextInput
-          style={styles.input}
+          style={tw`h-12 border border-gray-300 rounded-lg px-4 mb-4 bg-white`}
           placeholder="Confirmar Contraseña"
           secureTextEntry={true}
           value={confirmPassword}
           onChangeText={setConfirmPassword}
         />
 
-        <TouchableOpacity style={styles.registerButton} onPress={manejarRegistro}>
-          <Text style={styles.registerButtonText}>Registrar</Text>
+        <TouchableOpacity 
+          style={tw`bg-green-700 rounded-full h-12 justify-center items-center mb-6`}
+          onPress={manejarRegistro}
+        >
+          <Text style={tw`text-white text-lg font-bold`}>Registrar</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      {/* Modal de error */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showErrorModal}
+        onRequestClose={() => setShowErrorModal(false)}
+      >
+        <View style={tw`flex-1 justify-center items-center bg-black bg-opacity-50`}>
+          <View style={tw`bg-white rounded-lg p-8 w-3/4 shadow-lg`}>
+            <Text style={tw`text-lg font-bold text-red-600 mb-4`}>Error</Text>
+            <Text style={tw`text-gray-700 mb-6 text-center`}>
+              Por favor, completa todos los campos correctamente o asegúrate de que las contraseñas coincidan.
+            </Text>
+            <TouchableOpacity
+              style={tw`bg-red-600 rounded-lg py-2 px-4`}
+              onPress={() => setShowErrorModal(false)}
+            >
+              <Text style={tw`text-white text-center font-bold`}>Cerrar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-    backgroundColor: '#F5F5F5',
-  },
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-    color: '#333',
-  },
-  input: {
-    height: 50,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 15,
-    backgroundColor: '#fff',
-  },
-  dateInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 15,
-    backgroundColor: '#fff',
-  },
-  dateInput: {
-    flex: 1,
-    justifyContent: 'center',
-    height: 50,
-  },
-  dateText: {
-    color: '#333',
-  },
-  registerButton: {
-    backgroundColor: '#1E90FF',
-    borderRadius: 25,
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  registerButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-});
 
 export default Register;

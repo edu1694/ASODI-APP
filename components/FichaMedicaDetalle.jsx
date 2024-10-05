@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Switch } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, Switch } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Picker } from '@react-native-picker/picker'; 
 import Icon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import baseUrl from '../lib/config';
+import tw from 'tailwind-react-native-classnames';
 
 const FichaMedicaDetalle = () => {
   const route = useRoute();
@@ -32,7 +33,7 @@ const FichaMedicaDetalle = () => {
         if (storedRut) {
           setRut(storedRut); // Establece el RUT en el estado
         } else {
-          Alert.alert('Error', 'No se ha proporcionado un RUT válido.'); // Solo muestra la alerta si no hay un RUT
+          Alert.alert('Error', 'No se ha proporcionado un RUT válido.');
         }
       } catch (error) {
         console.error('Error al obtener el RUT del usuario:', error);
@@ -41,11 +42,9 @@ const FichaMedicaDetalle = () => {
   
     obtenerRutUsuario();
   
-    // Solo procede si el rut está disponible
     if (rut) {
       const fetchData = async () => {
         try {
-  
           const response = await fetch(`${baseUrl}/asodi/v1/fichas/${rut}/`);
           const data = await response.json();
           if (response.ok) {
@@ -103,7 +102,7 @@ const FichaMedicaDetalle = () => {
 
       if (response.ok) {
         Alert.alert('Éxito', 'Ficha médica actualizada exitosamente.');
-        setEditable(false); // Salir del modo de edición
+        setEditable(false);
       } else {
         Alert.alert('Error', `Error al actualizar la ficha médica: ${data.message || 'Error desconocido'}`);
       }
@@ -113,27 +112,27 @@ const FichaMedicaDetalle = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Ficha Médica</Text>
+    <SafeAreaView style={tw`flex-1 p-5`}>
+      <ScrollView contentContainerStyle={tw`flex-grow justify-center`}>
+        <View style={tw`flex-row justify-between items-center mb-6`}>
+          <Text style={tw`text-2xl font-bold text-green-700`}>Ficha Médica</Text>
           <TouchableOpacity onPress={() => setEditable(!editable)}>
-            <Icon name="pencil" size={24} color="black" />
+            <Icon name="pencil" size={24} color="#388e3c" />
           </TouchableOpacity>
         </View>
 
         {/* Campo de RUT con etiqueta */}
-        <Text style={styles.label}>RUT</Text>
+        <Text style={tw`text-lg mb-2 text-green-700`}>RUT</Text>
         <TextInput
-          style={styles.input}
+          style={[tw`border bg-white p-4 mb-4 rounded-lg`, { borderColor: '#388e3c' }]}
           value={rut}
           editable={false}
         />
 
         {/* Campo de Edad con etiqueta */}
-        <Text style={styles.label}>Edad</Text>
+        <Text style={tw`text-lg mb-2 text-green-700`}>Edad</Text>
         <TextInput
-          style={styles.input}
+          style={[tw`border bg-white p-4 mb-4 rounded-lg`, { borderColor: '#388e3c' }]}
           placeholder="Edad"
           keyboardType="numeric"
           onChangeText={setEdad}
@@ -142,13 +141,13 @@ const FichaMedicaDetalle = () => {
         />
 
         {/* Campo de Estatura con etiqueta */}
-        <Text style={styles.label}>Estatura (m)</Text>
+        <Text style={tw`text-lg mb-2 text-green-700`}>Estatura (m)</Text>
         <TextInput
-          style={styles.input}
+          style={[tw`border bg-white p-4 mb-4 rounded-lg`, { borderColor: '#388e3c' }]}
           placeholder="Estatura (m)"
           keyboardType="numeric"
           onChangeText={(text) => {
-            const numericValue = text.replace(/[^0-9.]/g, ''); // Eliminar caracteres no numéricos excepto el punto
+            const numericValue = text.replace(/[^0-9.]/g, ''); 
             if (/^\d*\.?\d{0,2}$/.test(numericValue)) {
               setEstatura(numericValue);
             }
@@ -158,11 +157,10 @@ const FichaMedicaDetalle = () => {
         />
 
         {/* Campo de Sexo con etiqueta */}
-        <Text style={styles.label}>Sexo</Text>
-        <View style={styles.pickerContainer}>
+        <Text style={tw`text-lg mb-2 text-green-700`}>Sexo</Text>
+        <View style={[tw`border bg-white p-4 mb-4 rounded-lg`, { borderColor: '#388e3c' }]}>
           <Picker
             selectedValue={sexo}
-            style={styles.picker}
             onValueChange={(itemValue) => setSexo(itemValue)}
             enabled={editable}
           >
@@ -173,9 +171,9 @@ const FichaMedicaDetalle = () => {
         </View>
 
         {/* Campo de Hospital Perteneciente con etiqueta */}
-        <Text style={styles.label}>Hospital Perteneciente</Text>
+        <Text style={tw`text-lg mb-2 text-green-700`}>Hospital Perteneciente</Text>
         <TextInput
-          style={styles.input}
+          style={[tw`border bg-white p-4 mb-4 rounded-lg`, { borderColor: '#388e3c' }]}
           placeholder="Hospital Perteneciente"
           onChangeText={setHospital}
           value={hospital}
@@ -183,73 +181,29 @@ const FichaMedicaDetalle = () => {
         />
 
         {/* Campos booleanos */}
-        <View style={styles.switchContainer}>
-          <Text style={styles.label}>Diabetes</Text>
-          <Switch
-            value={diabetes}
-            onValueChange={setDiabetes}
-            disabled={!editable}
-          />
-        </View>
-
-        <View style={styles.switchContainer}>
-          <Text style={styles.label}>Hipertensión</Text>
-          <Switch
-            value={hipertension}
-            onValueChange={setHipertension}
-            disabled={!editable}
-          />
-        </View>
-
-        <View style={styles.switchContainer}>
-          <Text style={styles.label}>Enfermedad del Corazón</Text>
-          <Switch
-            value={enfermedadCorazon}
-            onValueChange={setEnfermedadCorazon}
-            disabled={!editable}
-          />
-        </View>
-
-        <View style={styles.switchContainer}>
-          <Text style={styles.label}>Accidente Vascular</Text>
-          <Switch
-            value={accidenteVascular}
-            onValueChange={setAccidenteVascular}
-            disabled={!editable}
-          />
-        </View>
-
-        <View style={styles.switchContainer}>
-          <Text style={styles.label}>Trombosis</Text>
-          <Switch
-            value={trombosis}
-            onValueChange={setTrombosis}
-            disabled={!editable}
-          />
-        </View>
-
-        <View style={styles.switchContainer}>
-          <Text style={styles.label}>Epilepsia</Text>
-          <Switch
-            value={epilepsia}
-            onValueChange={setEpilepsia}
-            disabled={!editable}
-          />
-        </View>
-
-        <View style={styles.switchContainer}>
-          <Text style={styles.label}>Alergias</Text>
-          <Switch
-            value={alergias}
-            onValueChange={setAlergias}
-            disabled={!editable}
-          />
-        </View>
+        {[
+          { label: 'Diabetes', value: diabetes, setValue: setDiabetes },
+          { label: 'Hipertensión', value: hipertension, setValue: setHipertension },
+          { label: 'Enfermedad del Corazón', value: enfermedadCorazon, setValue: setEnfermedadCorazon },
+          { label: 'Accidente Vascular', value: accidenteVascular, setValue: setAccidenteVascular },
+          { label: 'Trombosis', value: trombosis, setValue: setTrombosis },
+          { label: 'Epilepsia', value: epilepsia, setValue: setEpilepsia },
+          { label: 'Alergias', value: alergias, setValue: setAlergias },
+        ].map((field, index) => (
+          <View key={index} style={tw`flex-row justify-between items-center mb-4`}>
+            <Text style={tw`text-lg text-green-700`}>{field.label}</Text>
+            <Switch
+              value={field.value}
+              onValueChange={field.setValue}
+              disabled={!editable}
+            />
+          </View>
+        ))}
 
         {/* Campo de Número de Contacto con etiqueta */}
-        <Text style={styles.label}>Número de Contacto</Text>
+        <Text style={tw`text-lg mb-2 text-green-700`}>Número de Contacto</Text>
         <TextInput
-          style={styles.input}
+          style={[tw`border bg-white p-4 mb-4 rounded-lg`, { borderColor: '#388e3c' }]}
           placeholder="Número de Contacto"
           keyboardType="numeric"
           onChangeText={setNumeroContacto}
@@ -258,78 +212,16 @@ const FichaMedicaDetalle = () => {
         />
 
         {editable && (
-          <TouchableOpacity style={styles.saveButton} onPress={handleUpdateFicha}>
-            <Text style={styles.saveButtonText}>Guardar Cambios</Text>
+          <TouchableOpacity 
+            style={[tw`bg-green-500 p-4 rounded-full`, { backgroundColor: '#388e3c' }]} 
+            onPress={handleUpdateFicha}
+          >
+            <Text style={tw`text-white text-lg font-bold`}>Guardar Cambios</Text>
           </TouchableOpacity>
         )}
       </ScrollView>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-  },
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: 'center',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  label: {
-    fontSize: 16,
-    color: '#333',
-    marginBottom: 5,
-  },
-  input: {
-    height: 50,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 15,
-    backgroundColor: '#fff',
-  },
-  pickerContainer: {
-    marginBottom: 15,
-  },
-  picker: {
-    height: 50,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    backgroundColor: '#fff',
-  },
-  switchContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  saveButton: {
-    backgroundColor: '#1E90FF',
-    borderRadius: 25,
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  saveButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-});
 
 export default FichaMedicaDetalle;

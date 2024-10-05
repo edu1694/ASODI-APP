@@ -1,32 +1,30 @@
-
-import React from 'react';
+import React, { useCallback } from 'react';
+import { View } from 'react-native'; // Asegúrate de importar View
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'; // Importa el Tab Navigator
 import { Ionicons } from '@expo/vector-icons'; // Para los íconos
-import PesoPresionChart from './components/PesoPresionChart';
+import PesoPresionChartComponent from './components/PesoPresionChart'; // Asegúrate de que este sea tu componente real
 import Home from './components/Home';
-import Contacto from './Contacto';
-import React, { useCallback } from 'react';
-import { Ionicons } from '@expo/vector-icons';
-import { Tab } from 'react-native-paper'; // O el componente Tab de react-navigation
+import Contacto from './components/Contacto';
 import { useFocusEffect } from '@react-navigation/native';
 
-
+// Componente PesoPresionChart
 function PesoPresionChart() {
   useFocusEffect(
     useCallback(() => {
-      // Lógica para actualizar los datos o realizar alguna acción
       console.log("La pestaña Resumen está en foco. Actualizando datos...");
       // Aquí puedes hacer una llamada a tu API o actualizar el estado
     }, [])
   );
 
   return (
-    // Tu componente de resumen aquí
     <View>
-      {/* El contenido de la pestaña Resumen */}
+      {/* El contenido de la pestaña Resumen aquí */}
     </View>
   );
 }
+
+// Navegador de pestañas
+const Tab = createBottomTabNavigator();
 
 function HomeTabs() {
   return (

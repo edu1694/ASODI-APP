@@ -1,20 +1,12 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { 
-  View, 
-  Text, 
-  SafeAreaView, 
-  StatusBar, 
-  StyleSheet, 
-  Dimensions,
-  Alert,
-  ScrollView
-} from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, SafeAreaView, ScrollView, Alert, Dimensions } from 'react-native';
 import { BarChart } from 'react-native-chart-kit';
 import moment from 'moment';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker'; 
-import { useFocusEffect } from '@react-navigation/native'; // Importa el hook useFocusEffect
+import { useFocusEffect } from '@react-navigation/native';
 import baseUrl from '../lib/config';
+import tw from 'tailwind-react-native-classnames';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -29,7 +21,7 @@ const PesoPresionChart = () => {
   const [selectedYearPeso, setSelectedYearPeso] = useState(new Date().getFullYear());
   const currentYear = new Date().getFullYear(); 
   const [usuarioRut, setUsuarioRut] = useState('');
-  // Hook para obtener datos cuando la pestaña de Resumen está en foco
+
   useFocusEffect(
     useCallback(() => {
       const obtenerRutUsuario = async () => {
@@ -118,31 +110,31 @@ const PesoPresionChart = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle='dark-content' />
-
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.chartContainer}>
-          <Text style={styles.title}>Mi presión histórica</Text>
-          <View style={styles.row}>
+    <SafeAreaView style={tw`flex-1 bg-white`}>
+      <ScrollView contentContainerStyle={tw`p-4`}>
+        <View style={tw`bg-green-100 p-4 rounded-lg mb-4`}>
+          <Text style={tw`text-lg font-bold text-green-700`}>Mi presión histórica</Text>
+          <View style={tw`flex-row justify-between items-center mb-2`}>
             <Picker
               selectedValue={selectedMonthPresion}
-              style={styles.picker}
+              style={tw`flex-1 border border-green-700 rounded bg-white text-green-700`}
               onValueChange={(itemValue) => {
                 setSelectedMonthPresion(itemValue);
                 filtrarDatosPresion(presiones, itemValue, selectedYearPresion);
-              }}>
+              }}
+            >
               {moment.months().map((month, index) => (
                 <Picker.Item label={month} value={index + 1} key={index} />
               ))}
             </Picker>
             <Picker
               selectedValue={selectedYearPresion}
-              style={styles.picker}
+              style={tw`flex-1 border border-green-500 rounded bg-white text-green-700 ml-2`}
               onValueChange={(itemValue) => {
                 setSelectedYearPresion(itemValue);
                 filtrarDatosPresion(presiones, selectedMonthPresion, itemValue);
-              }}>
+              }}
+            >
               {Array.from({ length: currentYear - 2000 + 1 }, (_, i) => 2000 + i).map(year => (
                 <Picker.Item label={year.toString()} value={year} key={year} />
               ))}
@@ -183,38 +175,36 @@ const PesoPresionChart = () => {
                 },
                 barPercentage: 0.5,
               }}
-              style={{
-                marginVertical: 8,
-                borderRadius: 16,
-                alignSelf: 'center',
-              }}
+              style={tw`my-4 rounded-lg`}
             />
           ) : (
-            <Text style={styles.noDataText}>No hay datos de presión disponibles.</Text>
+            <Text style={tw`text-center text-gray-500`}>No hay datos de presión disponibles.</Text>
           )}
         </View>
 
-        <View style={styles.chartContainer}>
-          <Text style={styles.title}>Mi peso histórico</Text>
-          <View style={styles.row}>
+        <View style={tw`bg-green-100 p-4 rounded-lg`}>
+          <Text style={tw`text-lg font-bold text-green-700`}>Mi peso histórico</Text>
+          <View style={tw`flex-row justify-between items-center mb-2`}>
             <Picker
               selectedValue={selectedMonthPeso}
-              style={styles.picker}
+              style={tw`flex-1 border border-green-700 rounded bg-white text-green-700`}
               onValueChange={(itemValue) => {
                 setSelectedMonthPeso(itemValue);
                 filtrarDatosPeso(pesos, itemValue, selectedYearPeso);
-              }}>
+              }}
+            >
               {moment.months().map((month, index) => (
                 <Picker.Item label={month} value={index + 1} key={index} />
               ))}
             </Picker>
             <Picker
               selectedValue={selectedYearPeso}
-              style={styles.picker}
+              style={tw`flex-1 border border-green-700 rounded bg-white text-green-700 ml-2`}
               onValueChange={(itemValue) => {
                 setSelectedYearPeso(itemValue);
                 filtrarDatosPeso(pesos, selectedMonthPeso, itemValue);
-              }}>
+              }}
+            >
               {Array.from({ length: currentYear - 2000 + 1 }, (_, i) => 2000 + i).map(year => (
                 <Picker.Item label={year.toString()} value={year} key={year} />
               ))}
@@ -251,59 +241,15 @@ const PesoPresionChart = () => {
                 },
                 barPercentage: 0.5,
               }}
-              style={{
-                marginVertical: 8,
-                borderRadius: 16,
-                alignSelf: 'center',
-              }}
+              style={tw`my-4 rounded-lg`}
             />
           ) : (
-            <Text style={styles.noDataText}>No hay datos de peso disponibles.</Text>
+            <Text style={tw`text-center text-gray-500`}>No hay datos de peso disponibles.</Text>
           )}
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-  },
-  scrollContainer: {
-    paddingBottom: 100, // Para evitar que el último gráfico quede debajo del footer
-  },
-  chartContainer: {
-    backgroundColor: '#f0f0f0',
-    padding: 20,
-    borderRadius: 16,
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#000',
-    textAlign: 'center',
-    marginBottom: 10,
-  },
-  picker: {
-    flex: 1,
-    color: '#000',
-    backgroundColor: '#fff',
-    borderRadius: 5,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  noDataText: {
-    fontSize: 16,
-    textAlign: 'center',
-    color: '#888',
-  },
-});
 
 export default PesoPresionChart;

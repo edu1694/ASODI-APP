@@ -21,7 +21,9 @@ npm install react-native-side-menu --save
 npm install @react-navigation/drawer
 npm install metro-react-native-babel-preset --save-dev
 npm install babel-preset-expo --save-dev
-
+npm install react-native-fast-image
+npm install react-native-gesture-handler
+npm install axios
 
 
 

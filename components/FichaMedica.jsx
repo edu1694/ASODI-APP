@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Picker } from '@react-native-picker/picker'; 
 import Icon from 'react-native-vector-icons/Ionicons';
 import baseUrl from '../lib/config';
+import tw from 'tailwind-react-native-classnames';
 
 const CustomCheckbox = ({ value, onValueChange }) => {
   return (
     <TouchableOpacity
       onPress={() => onValueChange(!value)}
-      style={[styles.checkbox, value && styles.checkboxChecked]}
+      style={[tw`h-6 w-6 border-2 rounded flex items-center justify-center`, value ? tw`bg-green-500` : tw`bg-white border-gray-400`]}
     >
       {value && <Icon name="checkmark" size={20} color="white" />}
     </TouchableOpacity>
@@ -78,7 +79,7 @@ const FichaMedica = (props) => {
 
       if (response.ok) {
         Alert.alert('Éxito', 'Ficha médica guardada exitosamente.');
-        props.onLogin()
+        props.onLogin();
       } else {
         console.error('Error al guardar la ficha médica:', data);
         Alert.alert('Error', `Error al guardar la ficha médica: ${data.message || 'Error desconocido'}`);
@@ -90,44 +91,45 @@ const FichaMedica = (props) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.title}>Ficha Médica</Text>
+    <SafeAreaView style={tw`flex-1 p-5`}>
+      <ScrollView contentContainerStyle={tw`flex-grow justify-center`}>
+        <Text style={tw`text-2xl font-bold text-green-700 text-center mb-5`}>Ficha Médica</Text>
 
         <TextInput
-          style={styles.input}
+          style={[tw`border bg-white p-4 mb-4 rounded-lg`, { borderColor: '#388e3c' }]}
           placeholder="Edad"
           keyboardType="numeric"
           onChangeText={setEdad}
           value={edad}
         />
         <TextInput
-          style={styles.input}
+          style={[tw`border bg-white p-4 mb-4 rounded-lg`, { borderColor: '#388e3c' }]}
           placeholder="Estatura (m)"
           keyboardType="numeric"
           onChangeText={(text) => {
-            const numericValue = text.replace(/[^0-9.]/g, ''); // Eliminar caracteres no numéricos excepto el punto
+            const numericValue = text.replace(/[^0-9.]/g, '');
             if (/^\d*\.?\d{0,2}$/.test(numericValue)) {
               setEstatura(numericValue);
             }
           }}
           value={estatura}
         />
-        <View style={styles.pickerContainer}>
-          <Text style={styles.label}>Sexo</Text>
-          <Picker
-            selectedValue={sexo}
-            style={styles.picker}
-            onValueChange={(itemValue) => setSexo(itemValue)}
-          >
-            <Picker.Item label="Selecciona tu sexo" value="" />
-            <Picker.Item label="Hombre" value="M" />
-            <Picker.Item label="Mujer" value="F" />
-          </Picker>
+        <View style={tw`mb-4`}>
+          <Text style={tw`text-lg mb-2 text-green-700`}>Sexo</Text>
+          <View style={[tw`border bg-white p-2 rounded-lg`, { borderColor: '#388e3c' }]}>
+            <Picker
+              selectedValue={sexo}
+              onValueChange={(itemValue) => setSexo(itemValue)}
+            >
+              <Picker.Item label="Selecciona tu sexo" value="" />
+              <Picker.Item label="Hombre" value="M" />
+              <Picker.Item label="Mujer" value="F" />
+            </Picker>
+          </View>
         </View>
 
         <TextInput
-          style={styles.input}
+          style={[tw`border bg-white p-4 mb-4 rounded-lg`, { borderColor: '#388e3c' }]}
           placeholder="Hospital Perteneciente"
           onChangeText={setHospital}
           value={hospital}
@@ -142,100 +144,26 @@ const FichaMedica = (props) => {
           { label: 'Epilepsia', value: epilepsia, onChange: setEpilepsia },
           { label: 'Alergias', value: alergias, onChange: setAlergias }
         ].map((item, index) => (
-          <View key={index} style={styles.checkboxContainer}>
-            <Text style={styles.label}>{`¿Tienes ${item.label}?`}</Text>
+          <View key={index} style={tw`flex-row justify-between items-center mb-4`}>
+            <Text style={tw`text-lg text-green-700`}>{`¿Tienes ${item.label}?`}</Text>
             <CustomCheckbox value={item.value} onValueChange={item.onChange} />
           </View>
         ))}
 
         <TextInput
-          style={styles.input}
+          style={[tw`border bg-white p-4 mb-4 rounded-lg`, { borderColor: '#388e3c' }]}
           placeholder="Número de Contacto"
           keyboardType="numeric"
           onChangeText={setNumeroContacto}
           value={numeroContacto}
         />
 
-        <TouchableOpacity style={styles.saveButton} onPress={handleSaveFicha}>
-          <Text style={styles.saveButtonText}>Guardar Ficha Médica</Text>
+        <TouchableOpacity style={[tw`bg-green-500 p-4 rounded-full`, { backgroundColor: '#388e3c' }]} onPress={handleSaveFicha}>
+          <Text style={tw`text-white text-lg font-bold text-center`}>Guardar Ficha Médica</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-  },
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-    color: '#333',
-  },
-  input: {
-    height: 50,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 15,
-    backgroundColor: '#fff',
-  },
-  pickerContainer: {
-    marginBottom: 15,
-  },
-  label: {
-    fontSize: 18,
-    color: '#333',
-    marginBottom: 5,
-  },
-  picker: {
-    height: 50,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    backgroundColor: '#fff',
-  },
-  checkboxContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  checkbox: {
-    height: 24,
-    width: 24,
-    borderWidth: 2,
-    borderColor: '#ccc',
-    borderRadius: 4,
-    backgroundColor: 'white',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  checkboxChecked: {
-    backgroundColor: '#1E90FF',
-  },
-  saveButton: {
-    backgroundColor: '#1E90FF',
-    borderRadius: 25,
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  saveButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-});
 
 export default FichaMedica;

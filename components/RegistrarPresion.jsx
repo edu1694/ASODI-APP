@@ -3,7 +3,6 @@ import {
   View, 
   TextInput, 
   Alert, 
-  StyleSheet, 
   Text,
   TouchableOpacity,
   FlatList,
@@ -16,6 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Ionicons';
 import baseUrl from '../lib/config';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import tw from 'tailwind-react-native-classnames'; // Importa Tailwind
 
 const RegistrarPresion = () => {
   const [presionDiastolica, setPresionDiastolica] = useState('');
@@ -132,42 +132,39 @@ const RegistrarPresion = () => {
   };
 
   const renderItem = ({ item }) => (
-    <View style={styles.presionItem}>
-      <View style={styles.presionInfo}>
-        <Text style={styles.presionText}>Fecha: {item.fecha_registro}</Text>
-        <Text style={styles.presionText}>Presión Sistólica: {item.presion_sistolica} mmHg</Text>
-        <Text style={styles.presionText}>Presión Diastólica: {item.presion_diastolica} mmHg</Text>
-        <Text style={styles.presionText}>Frecuencia Cardiaca: {item.frecuenciacardiaca} bpm</Text>
+    <View style={[tw`p-4 mb-4 rounded-lg`, { backgroundColor: '#e8f5e9' }]}>
+      <View style={tw`flex-1`}>
+        <Text style={[tw`text-lg`, { color: '#388e3c' }]}>Fecha: {item.fecha_registro}</Text>
+        <Text style={[tw`text-lg`, { color: '#388e3c' }]}>Presión Sistólica: {item.presion_sistolica} mmHg</Text>
+        <Text style={[tw`text-lg`, { color: '#388e3c' }]}>Presión Diastólica: {item.presion_diastolica} mmHg</Text>
+        <Text style={[tw`text-lg`, { color: '#388e3c' }]}>Frecuencia Cardiaca: {item.frecuenciacardiaca} bpm</Text>
       </View>
       <TouchableOpacity onPress={() => eliminarPresionMedica(item.id_presion)}>
-        <Icon name="trash-outline" size={24} color="red" />
+        <Icon name="trash-outline" size={24} color="#d32f2f" />
       </TouchableOpacity>
     </View>
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle='dark-content' />
-      
-      <View>
-        <Text style={styles.title}>Registrar Presión Arterial</Text>
+    <SafeAreaView style={[tw`flex-1 px-4`, { backgroundColor: '#f0f4f8' }]}>
+      <StatusBar barStyle="dark-content" />
 
-        <View style={styles.dateInputContainer}>
+      <View>
+        <Text style={[tw`text-2xl font-bold text-center mb-4`, { color: '#388e3c' }]}>Registrar Presión Arterial</Text>
+
+        <View style={[tw`flex-row items-center border bg-white rounded-lg p-2 mb-4`, { borderColor: '#388e3c' }]}>
           <TouchableOpacity 
-            style={styles.dateInput}
+            style={tw`flex-1`}
             onPress={() => {
-              Keyboard.dismiss(); // Cerrar el teclado antes de mostrar el DatePicker
+              Keyboard.dismiss();
               setShowDatePicker(true);
             }}
           >
-            <Text style={styles.dateText}>
+            <Text style={[tw`text-lg`, { color: '#388e3c' }]}>
               {fechaRegistro ? fechaRegistro.toLocaleDateString('es-ES') : 'DD-MM-AAAA'}
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => {
-            Keyboard.dismiss();
-            setShowDatePicker(true);
-          }}>
+          <TouchableOpacity onPress={() => setShowDatePicker(true)}>
             <Icon name="calendar-outline" size={24} color="gray" />
           </TouchableOpacity>
         </View>
@@ -183,21 +180,21 @@ const RegistrarPresion = () => {
         )}
 
         <TextInput
-          style={styles.input}
+          style={[tw`border bg-white rounded-lg p-3 mb-4`, { borderColor: '#388e3c' }]}
           placeholder="Presión Sistólica (mmHg)"
           keyboardType="numeric"
           onChangeText={text => setPresionSistolica(text)}
           value={presionSistolica}
         />
         <TextInput
-          style={styles.input}
+          style={[tw`border bg-white rounded-lg p-3 mb-4`, { borderColor: '#388e3c' }]}
           placeholder="Presión Diastólica (mmHg)"
           keyboardType="numeric"
           onChangeText={text => setPresionDiastolica(text)}
           value={presionDiastolica}
         />
         <TextInput
-          style={styles.input}
+          style={[tw`border bg-white rounded-lg p-3 mb-4`, { borderColor: '#388e3c' }]}
           placeholder="Frecuencia Cardiaca (bpm)"
           keyboardType="numeric"
           onChangeText={text => setFrecuenciaCardiaca(text)}
@@ -205,113 +202,23 @@ const RegistrarPresion = () => {
         />
 
         <TouchableOpacity 
-          style={styles.presionButton} 
+          style={[tw`rounded-full h-12 flex items-center justify-center mt-4`, { backgroundColor: '#388e3c' }]}
           onPress={crearPresion}
         >
-          <Text style={styles.presionButtonText}>Registrar Presión</Text>
+          <Text style={tw`text-white text-lg font-bold`}>Registrar Presión</Text>
         </TouchableOpacity>
 
-        <Text style={styles.subtitle}>Registros de Presión Arterial</Text>
+        <Text style={[tw`text-xl font-bold text-center my-6`, { color: '#388e3c' }]}>Registros de Presión Arterial</Text>
       </View>
 
       <FlatList
         data={presiones}
         renderItem={renderItem}
         keyExtractor={item => item.id_presion.toString()}
-        contentContainerStyle={styles.presionesContainer}
+        contentContainerStyle={tw`pb-6`}
       />
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 15,
-    backgroundColor: '#f2f2f2',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-    color: '#333',
-  },
-  subtitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginVertical: 20,
-    textAlign: 'center',
-    color: '#333',
-  },
-  dateInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 15,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    height: 50,
-    backgroundColor: '#fff',
-  },
-  dateInput: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  dateText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  input: {
-    height: 50,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 15,
-    backgroundColor: '#fff',
-    fontSize: 16,
-  },
-  presionButton: {
-    backgroundColor: '#1E90FF',
-    borderRadius: 25,
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  presionButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  presionesContainer: {
-    marginTop: 10,
-    paddingBottom: 20,
-  },
-  presionItem: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 2,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  presionInfo: {
-    flex: 1,
-    marginRight: 10,
-  },
-  presionText: {
-    fontSize: 16,
-    color: '#333',
-  },
-});
 
 export default RegistrarPresion;
