@@ -20,6 +20,7 @@ import RegistrarPeso from './components/RegistrarPeso';
 import FichaMedicaDetalle from './components/FichaMedicaDetalle';
 import Contacto from './components/Contacto';
 import RegistrarCitaMedica from './components/RegistrarCitaMedica';
+import Anuncios from './components/Anuncios';
 
 // Declaraciones de navegadores
 const Stack = createStackNavigator();
@@ -92,7 +93,7 @@ function MainDrawerNavigator({ onLogout }) {
   return (
     <Drawer.Navigator 
       drawerContent={(props) => <CustomDrawerContent {...props} onLogout={onLogout} />}
-      screenOptions={{ headerShown: true, headerTitle: 'Asodi' }} // Cambiamos el título del Top Bar aquí
+      screenOptions={{ headerShown: true, headerTitle: 'ASODI' }} // Cambiamos el título del Top Bar aquí
     >
       <Drawer.Screen 
         name="Home" 
@@ -122,6 +123,11 @@ function MainDrawerNavigator({ onLogout }) {
         name="RegistrarPeso" 
         component={RegistrarPeso} 
         options={{ drawerLabel: 'Registrar Peso' }} // Mantén el nombre en el menú lateral
+      />
+      <Drawer.Screen 
+        name="Anuncios" 
+        component={Anuncios} 
+        options={{ drawerLabel: 'Anuncios' }} // Mantén el nombre en el menú lateral
       />
     </Drawer.Navigator>
   );

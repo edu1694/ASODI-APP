@@ -1,33 +1,33 @@
-import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
 import { 
   View, 
   TextInput, 
-  Alert, 
-  StyleSheet, 
   Text,
-  ScrollView,
-  TouchableOpacity
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  Modal
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native'; 
 import { SafeAreaView } from 'react-native-safe-area-context'; 
 import Icon from 'react-native-vector-icons/Ionicons'; 
+import { LinearGradient } from 'expo-linear-gradient';
 import baseUrl from '../lib/config';
-
 
 const Login = (props) => {
   const [correo, setCorreo] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false); // Estado para el modal de error
   const navigation = useNavigation(); 
 
   const manejarLogin = async () => {
     if (!correo || !password) {
-      Alert.alert('Error', 'Por favor, ingresa tu correo y contraseña');
+      setShowErrorModal(true); // Mostrar el modal si falta correo o contraseña
       return;
     }
-  
+
     try {
       const response = await fetch(`${baseUrl}/asodi/v1/usuarios/`, {
         method: 'GET',
@@ -35,23 +35,20 @@ const Login = (props) => {
           'Content-Type': 'application/json',
         }
       });
-  
+
       if (!response.ok) {
         throw new Error('Error en la solicitud');
       }
-  
+
       const usuarios = await response.json();
-  
+
       const usuarioEncontrado = usuarios.find(user =>
         user.correo === correo && user.password === password
       );
       
       if (usuarioEncontrado) {
-        Alert.alert('Éxito', 'Inicio de sesión exitoso');
-        console.log('Inicio de sesión exitoso:', usuarioEncontrado);
         await AsyncStorage.setItem('usuarioRut', usuarioEncontrado.rut);
 
-        // Verificar si el usuario ya tiene la ficha médica completada
         const fichaResponse = await fetch(`${baseUrl}/asodi/v1/fichas/${usuarioEncontrado.rut}/`, {
           method: 'GET',
           headers: {
@@ -60,156 +57,254 @@ const Login = (props) => {
         });
 
         if (fichaResponse.ok) {
-          // Si la ficha existe, redirigir a Home
-          props.onLogin(); // Cambia el estado de autenticación en App.js
+          props.onLogin(); 
         } else {
-          // Si no existe, redirigir a la pantalla de Ficha Médica
           navigation.navigate('FichaMedica', { rut: usuarioEncontrado.rut });
         }
       } else {
-        Alert.alert('Error', 'Usuario no encontrado o contraseña incorrecta');
-        console.log('Error de inicio de sesión: Usuario no encontrado o contraseña incorrecta');
+        setShowErrorModal(true); // Mostrar el modal en caso de error en el inicio de sesión
       }
     } catch (error) {
       console.error('Error de conexión con el servidor:', error);
-      Alert.alert('Error', 'No se pudo conectar con el servidor');
+      setShowErrorModal(true); // Mostrar el modal si hay error de conexión
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar style='light'/>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.title}>Inicio de Sesión</Text>
-
-        <TextInput
-          style={styles.input}
-          placeholder="Correo"
-          keyboardType="email-address"
-          onChangeText={setCorreo}
-          value={correo}
+      {/* Fondo blanco para la parte superior */}
+      <View style={styles.whiteBackground}>
+        <Image 
+          style={styles.logo} 
+          source={require('../assets/images/logoasodi.png')} 
+          resizeMode="contain"
         />
-        <View style={styles.passwordContainer}>
+      </View>
+
+      {/* Fondo verde para la parte inferior */}
+      <LinearGradient
+        colors={['#007f5f', '#006442']} // Verdes oscuros para el formulario
+        style={styles.greenBackground}
+      >
+        {/* Formulario de Inicio de Sesión */}
+        <View style={styles.formContainer}>
+          <Text style={styles.title}>Inicio de Sesión</Text>
+
           <TextInput
-            style={styles.passwordInput}
-            placeholder="Contraseña"
-            secureTextEntry={!showPassword}
-            onChangeText={setPassword}
-            value={password}
+            style={styles.input}
+            placeholder="Correo"
+            keyboardType="email-address"
+            onChangeText={setCorreo}
+            value={correo}
           />
-          <TouchableOpacity
-            style={styles.eyeButton}
-            onPress={() => setShowPassword(!showPassword)}
-          >
-            <Icon 
-              name={showPassword ? 'eye' : 'eye-off'} 
-              size={20} 
-              color="grey" 
+          
+          <View style={styles.passwordContainer}>
+            <TextInput
+              style={styles.inputPassword}
+              placeholder="Contraseña"
+              secureTextEntry={!showPassword}
+              onChangeText={setPassword}
+              value={password}
             />
+            <TouchableOpacity
+              style={styles.eyeIcon}
+              onPress={() => setShowPassword(!showPassword)}
+            >
+              <Icon 
+                name={showPassword ? 'eye' : 'eye-off'} 
+                size={20} 
+                color="grey" 
+              />
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity 
+            style={styles.loginButton}
+            onPress={manejarLogin}
+          >
+            <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
           </TouchableOpacity>
-        </View>
 
-        <TouchableOpacity 
-          style={styles.loginButton} 
-          onPress={manejarLogin}
-        >
-          <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
-        </TouchableOpacity>
-
-        <View style={styles.footer}>
           <TouchableOpacity onPress={() => navigation.navigate('RecPassword')}>
-            <Text style={styles.footerLink}>¿Has olvidado tu contraseña?</Text>
+            <Text style={styles.forgotPassword}>¿Has olvidado tu contraseña?</Text>
           </TouchableOpacity>
-          <View style={styles.footerRow}>
-            <Text style={styles.footerText}>No tienes una cuenta? </Text>
+
+          <View style={styles.signupContainer}>
+            <Text style={styles.noAccountText}>No tienes una cuenta? </Text>
             <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-              <Text style={styles.footerLink}>Crea cuenta</Text>
+              <Text style={styles.signupText}>Crea cuenta</Text>
             </TouchableOpacity>
           </View>
         </View>
-      </ScrollView>
+      </LinearGradient>
+
+      {/* Modal de error */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showErrorModal}
+        onRequestClose={() => setShowErrorModal(false)} // Cerrar modal
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Error</Text>
+            <Text style={styles.modalMessage}>Por favor, ingresa tu correo y contraseña correctamente.</Text>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => setShowErrorModal(false)} // Cerrar modal al presionar el botón
+            >
+              <Text style={styles.modalButtonText}>Cerrar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
     </SafeAreaView>
   );
 };
 
+export default Login;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    padding: 20,
+    backgroundColor: 'white',
   },
-  scrollContainer: {
-    flexGrow: 1,
+  whiteBackground: {
+    width: '100%',
+    height: 200, // Reducimos la altura de la parte blanca
     justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderBottomLeftRadius: 50,
+    borderBottomRightRadius: 50,
+  },
+  greenBackground: {
+    flex: 1,
+    width: '100%',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    paddingTop: 50,
+    borderTopLeftRadius: 50,
+    borderTopRightRadius: 50,
+  },
+  logo: {
+    width: 300,
+    height: 160,
+  },
+  formContainer: {
+    width: '90%',
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
+    alignItems: 'center',
+    marginTop: 0,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
+    color: '#007f5f',
     textAlign: 'center',
-    color: '#333',
+    marginBottom: 20,
   },
   input: {
     height: 50,
-    borderColor: '#ccc',
+    borderColor: '#cccccc',
     borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
+    borderRadius: 25,
+    paddingHorizontal: 20,
     marginBottom: 15,
-    backgroundColor: '#fff',
+    backgroundColor: '#f7f7f7',
+    width: '100%',
   },
   passwordContainer: {
     position: 'relative',
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 15,
+    width: '100%',
   },
-  passwordInput: {
+  inputPassword: {
     height: 50,
-    borderColor: '#ccc',
+    borderColor: '#cccccc',
     borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    backgroundColor: '#fff',
-    flex: 1,
+    borderRadius: 25,
+    paddingHorizontal: 20,
+    backgroundColor: '#f7f7f7',
+    width: '100%',
   },
-  eyeButton: {
+  eyeIcon: {
     position: 'absolute',
-    right: 10,
-    height: 50,
-    width: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
+    right: 15,
+    top: 15,
   },
   loginButton: {
-    backgroundColor: '#1E90FF',
+    backgroundColor: '#007f5f',
     borderRadius: 25,
     height: 50,
     justifyContent: 'center',
     alignItems: 'center',
+    marginVertical: 20,
+    width: '100%',
   },
   loginButtonText: {
-    color: '#fff',
+    color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
   },
-  footer: {
-    marginTop: 20,
-    alignItems: 'center',
+  forgotPassword: {
+    color: '#007f5f',
+    textAlign: 'center',
+    marginBottom: 20,
   },
-  footerRow: {
+  signupContainer: {
     flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  noAccountText: {
+    color: '#666666',
+  },
+  signupText: {
+    color: '#007f5f',
+    fontWeight: 'bold',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
-  footerText: {
-    fontSize: 16,
-    color: '#000',
+  modalContent: {
+    width: 300,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center',
+    elevation: 5,
   },
-  footerLink: {
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#007f5f',
+    marginBottom: 10,
+  },
+  modalMessage: {
     fontSize: 16,
-    color: '#1E90FF',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  modalButton: {
+    backgroundColor: '#007f5f',
+    borderRadius: 10,
+    padding: 10,
+    alignItems: 'center',
+    width: '100%',
+  },
+  modalButtonText: {
+    color: 'white',
+    fontSize: 16,
     fontWeight: 'bold',
   },
 });
-
-export default Login;

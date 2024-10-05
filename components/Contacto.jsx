@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Linking, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Linking, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
+import tw from 'tailwind-react-native-classnames';
 
 const Contacto = () => {
   const handleCall = () => {
@@ -37,116 +38,90 @@ const Contacto = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.title}>Contáctanos</Text>
+    <SafeAreaView style={tw`flex-1 bg-white`}>
+      <ScrollView contentContainerStyle={tw`flex-grow justify-center p-4`}>
+        <Text style={tw`text-2xl font-bold text-center text-green-700 mb-6`}>Contáctanos</Text>
 
-        <TouchableOpacity style={styles.contactButton} onPress={handleCall}>
-          <Icon name="call-outline" size={24} color="#000000" />
-          <Text style={styles.contactButtonText}>Llámanos</Text>
-          <Text style={styles.contactButtonSubtext}>Entérate de las últimas noticias de ASODI que tiene para ti.</Text>
+        {/* Botón para llamar */}
+        <TouchableOpacity style={tw`bg-green-600 p-4 rounded-lg mb-4`} onPress={handleCall}>
+          <View style={tw`flex-row items-center justify-center`}>
+            <Icon name="call-outline" size={24} color="#FFFFFF" />
+            <Text style={tw`text-white font-bold text-lg ml-2`}>Llámanos</Text>
+          </View>
+          <Text style={tw`text-white text-center mt-2`}>
+            Entérate de las últimas noticias de ASODI.
+          </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.contactButton} onPress={handleMessage}>
-          <Icon name="chatbubble-outline" size={24} color="#000000" />
-          <Text style={styles.contactButtonText}>Envíanos un mensaje</Text>
-          <Text style={styles.contactButtonSubtext}>Es importante mantener registro de tus síntomas para tu doctor.</Text>
+        {/* Botón para enviar mensaje */}
+        <TouchableOpacity style={tw`bg-green-600 p-4 rounded-lg mb-4`} onPress={handleMessage}>
+          <View style={tw`flex-row items-center justify-center`}>
+            <Icon name="chatbubble-outline" size={24} color="#FFFFFF" />
+            <Text style={tw`text-white font-bold text-lg ml-2`}>Envíanos un mensaje</Text>
+          </View>
+          <Text style={tw`text-white text-center mt-2`}>
+            Es importante mantener registro de tus síntomas para tu doctor.
+          </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.contactButton} onPress={handleEmail}>
-          <Icon name="mail-outline" size={24} color="#000000" />
-          <Text style={styles.contactButtonText}>Envíanos un correo</Text>
-          <Text style={styles.contactButtonSubtext}>Dirección: Rancagua 0226, Providencia, Región Metropolitana</Text>
+        {/* Botón para enviar correo */}
+        <TouchableOpacity style={tw`bg-green-600 p-4 rounded-lg mb-4`} onPress={handleEmail}>
+          <View style={tw`flex-row items-center justify-center`}>
+            <Icon name="mail-outline" size={24} color="#FFFFFF" />
+            <Text style={tw`text-white font-bold text-lg ml-2`}>Envíanos un correo</Text>
+          </View>
+          <Text style={tw`text-white text-center mt-2`}>
+            Dirección: Rancagua 0226, Providencia, Región Metropolitana.
+          </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.contactButton} onPress={handleWebsite}>
-          <Icon name="globe-outline" size={24} color="#000000" />
-          <Text style={styles.contactButtonText}>Visita nuestro sitio web</Text>
-          <Text style={styles.contactButtonSubtext}>Si tienes alguna duda, visita nuestro sitio web: https://asodi.cl</Text>
+        {/* Botón para visitar sitio web */}
+        <TouchableOpacity style={tw`bg-green-600 p-4 rounded-lg mb-4`} onPress={handleWebsite}>
+          <View style={tw`flex-row items-center justify-center`}>
+            <Icon name="globe-outline" size={24} color="#FFFFFF" />
+            <Text style={tw`text-white font-bold text-lg ml-2`}>Visita nuestro sitio web</Text>
+          </View>
+          <Text style={tw`text-white text-center mt-2`}>
+            Si tienes alguna duda, visita nuestro sitio web: https://asodi.cl.
+          </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.contactButton} onPress={handleVisit}>
-          <Icon name="location-outline" size={24} color="#000000" />
-          <Text style={styles.contactButtonText}>Visítanos</Text>
-          <Text style={styles.contactButtonSubtext}>Dirección: Rancagua 0226, Providencia, Región Metropolitana</Text>
+        {/* Botón para dirección física */}
+        <TouchableOpacity style={tw`bg-green-600 p-4 rounded-lg mb-4`} onPress={handleVisit}>
+          <View style={tw`flex-row items-center justify-center`}>
+            <Icon name="location-outline" size={24} color="#FFFFFF" />
+            <Text style={tw`text-white font-bold text-lg ml-2`}>Visítanos</Text>
+          </View>
+          <Text style={tw`text-white text-center mt-2`}>
+            Dirección: Rancagua 0226, Providencia, Región Metropolitana.
+          </Text>
         </TouchableOpacity>
 
-        <Text style={styles.footerText}>Síguenos en nuestras redes sociales</Text>
+        {/* Redes Sociales */}
+        <Text style={tw`text-green-700 text-lg font-bold text-center mb-4`}>
+          Síguenos en nuestras redes sociales
+        </Text>
 
-        <View style={styles.socialMediaIcons}>
-            <TouchableOpacity onPress={() => handleSocialMedia('https://www.facebook.com/people/ASODI/100062871145302/?locale=gl_ES')}>
-                <Icon name="logo-facebook" size={30} color="#000000" style={styles.socialIcon} />
-            </TouchableOpacity>
+        <View style={tw`flex-row justify-center`}>
+          <TouchableOpacity onPress={() => handleSocialMedia('https://www.facebook.com/people/ASODI/100062871145302/?locale=gl_ES')}>
+            <Icon name="logo-facebook" size={30} color="#1B74E4" style={tw`mx-2`} />
+          </TouchableOpacity>
           <TouchableOpacity onPress={() => handleSocialMedia('https://www.instagram.com/asodichile/?hl=es-la')}>
-            <Icon name="logo-instagram" size={30} color="#000000" style={styles.socialIcon} />
+            <Icon name="logo-instagram" size={30} color="#C13584" style={tw`mx-2`} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleSocialMedia('https://x.com/asodichile?lang=es&mx=2')}>
-            <Icon name="logo-twitter" size={30} color="#000000" style={styles.socialIcon} />
+            <Icon name="logo-twitter" size={30} color="#1DA1F2" style={tw`mx-2`} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleSocialMedia('https://www.youtube.com/@ASODIChile')}>
-            <Icon name="logo-youtube" size={30} color="#000000" style={styles.socialIcon} />
+            <Icon name="logo-youtube" size={30} color="#FF0000" style={tw`mx-2`} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleSocialMedia('https://cl.linkedin.com/company/asodi-chile')}>
-            <Icon name="logo-linkedin" size={30} color="#000000" style={styles.socialIcon} />
+            <Icon name="logo-linkedin" size={30} color="#0077B5" style={tw`mx-2`} />
           </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 20,
-  },
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#000000',
-    marginBottom: 20,
-  },
-  contactButton: {
-    backgroundColor: '#fff', // Verde más claro
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 20,
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  contactButtonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000000',
-    marginTop: 10,
-  },
-  contactButtonSubtext: {
-    fontSize: 14,
-    color: '#000000', // Texto más claro
-    textAlign: 'center',
-    marginTop: 5,
-  },
-  footerText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#',
-    marginTop: 20,
-    marginBottom: 10,
-  },
-  socialMediaIcons: {
-    flexDirection: 'row',
-    color: '000000',
-    justifyContent: 'center',
-  },
-  socialIcon: {
-    marginHorizontal: 10,
-  },
-});
 
 export default Contacto;
