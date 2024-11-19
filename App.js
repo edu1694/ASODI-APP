@@ -93,7 +93,13 @@ function MainDrawerNavigator({ onLogout }) {
   return (
     <Drawer.Navigator 
       drawerContent={(props) => <CustomDrawerContent {...props} onLogout={onLogout} />}
-      screenOptions={{ headerShown: true, headerTitle: 'ASODI' }} // Cambiamos el título del Top Bar aquí
+      screenOptions={{ 
+        headerShown: true,
+        headerTitle: 'ASODI',
+        headerTitleStyle: {
+          color: 'rgb(22, 101, 52)', // Cambia el color del título a verde
+        }
+      }} // Cambiamos el título del Top Bar aquí
     >
       <Drawer.Screen 
         name="Home" 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, Alert, StyleSheet, ScrollView} from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, Alert, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native'; 
 import baseUrl from '../lib/config';
@@ -15,21 +15,21 @@ const RecPassword = () => {
       return;
     }
 
-    setIsLoading(true); // Para mostrar un indicador de carga, si es necesario
+    setIsLoading(true); 
     try {
-      const response = await fetch(`${baseUrl}/api/password_reset/`, {  // Cambia el endpoint aquí
+      const response = await fetch(`${baseUrl}/api/password_reset/`, {  
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email: correo }), // Enviar el correo al servidor
+        body: JSON.stringify({ email: correo }), 
       });
 
       const data = await response.json();
 
       if (response.ok) {
         Alert.alert('Éxito', 'Se ha enviado un enlace de recuperación a tu correo.');
-        navigation.navigate('Login'); // Redirige de nuevo al login después de la recuperación
+        navigation.navigate('Login'); 
       } else {
         Alert.alert('Error', data.detail || 'No se pudo enviar la solicitud.');
       }
@@ -77,6 +77,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    backgroundColor: '#F0FAF4', // Fondo claro en verde suave
     justifyContent: 'center',
   },
   scrollContainer: {
@@ -88,18 +89,19 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 20,
+    color: '#046307', // Verde oscuro
   },
   input: {
     height: 50,
-    borderColor: '#ccc',
+    borderColor: '#28A745', // Verde vibrante
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
   },
   recuperarButton: {
-    backgroundColor: '#1E90FF',
+    backgroundColor: '#046307', // Verde oscuro
     borderRadius: 25,
     height: 50,
     justifyContent: 'center',
@@ -107,7 +109,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   recuperarButtonText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 18,
     fontWeight: 'bold',
   },
@@ -116,7 +118,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   footerLink: {
-    color: '#1E90FF',
+    color: '#28A745', // Verde vibrante
     fontSize: 16,
     fontWeight: 'bold',
   },

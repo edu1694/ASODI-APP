@@ -3,7 +3,7 @@ import { View, Text, SafeAreaView, ScrollView, Alert, Dimensions } from 'react-n
 import { BarChart } from 'react-native-chart-kit';
 import moment from 'moment';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Picker } from '@react-native-picker/picker'; 
+import { Picker } from '@react-native-picker/picker';
 import { useFocusEffect } from '@react-navigation/native';
 import baseUrl from '../lib/config';
 import tw from 'tailwind-react-native-classnames';
@@ -19,7 +19,7 @@ const PesoPresionChart = () => {
   const [filteredDataPeso, setFilteredDataPeso] = useState([]);
   const [selectedMonthPeso, setSelectedMonthPeso] = useState(new Date().getMonth() + 1);
   const [selectedYearPeso, setSelectedYearPeso] = useState(new Date().getFullYear());
-  const currentYear = new Date().getFullYear(); 
+  const currentYear = new Date().getFullYear();
   const [usuarioRut, setUsuarioRut] = useState('');
 
   useFocusEffect(
@@ -55,8 +55,6 @@ const PesoPresionChart = () => {
         if (Array.isArray(pesosUsuario)) {
           setPesos(pesosUsuario);
           filtrarDatosPeso(pesosUsuario, selectedMonthPeso, selectedYearPeso);
-        } else {
-          console.error('Datos de peso no válidos:', pesosUsuario);
         }
       } else {
         Alert.alert('Error', 'No se pudo obtener los registros de peso');
@@ -80,8 +78,6 @@ const PesoPresionChart = () => {
         if (Array.isArray(presionesUsuario)) {
           setPresiones(presionesUsuario);
           filtrarDatosPresion(presionesUsuario, selectedMonthPresion, selectedYearPresion);
-        } else {
-          console.error('Datos de presión no válidos:', presionesUsuario);
         }
       } else {
         Alert.alert('Error', 'No se pudo obtener los registros de presión');
@@ -93,7 +89,6 @@ const PesoPresionChart = () => {
 
   const filtrarDatosPeso = (pesos, month, year) => {
     const datosFiltrados = pesos.filter(peso => {
-      if (!peso || !peso.fecha_registro) return false; 
       const fecha = moment(peso.fecha_registro);
       return fecha.month() + 1 === month && fecha.year() === year;
     });
@@ -102,7 +97,6 @@ const PesoPresionChart = () => {
 
   const filtrarDatosPresion = (presiones, month, year) => {
     const datosFiltrados = presiones.filter(presion => {
-      if (!presion || !presion.fecha_registro) return false; 
       const fecha = moment(presion.fecha_registro);
       return fecha.month() + 1 === month && fecha.year() === year;
     });
@@ -112,6 +106,7 @@ const PesoPresionChart = () => {
   return (
     <SafeAreaView style={tw`flex-1 bg-white`}>
       <ScrollView contentContainerStyle={tw`p-4`}>
+        {/* Gráfico de Presión */}
         <View style={tw`bg-green-100 p-4 rounded-lg mb-4`}>
           <Text style={tw`text-lg font-bold text-green-700`}>Mi presión histórica</Text>
           <View style={tw`flex-row justify-between items-center mb-2`}>
@@ -140,22 +135,16 @@ const PesoPresionChart = () => {
               ))}
             </Picker>
           </View>
-          {filteredDataPresion.length > 0 ? (
+          <ScrollView horizontal={true} style={tw`overflow-hidden`}>
             <BarChart
               data={{
                 labels: filteredDataPresion.map(data => moment(data.fecha_registro).format('DD/MM')),
                 datasets: [
-                  {
-                    data: filteredDataPresion.map(data => data.presion_sistolica || 0),
-                    color: () => `#0A0A0A`,
-                  },
-                  {
-                    data: filteredDataPresion.map(data => data.presion_diastolica || 0),
-                    color: () => `#3A3A3A`,
-                  }
+                  { data: filteredDataPresion.map(data => data.presion_sistolica || 0), color: () => `#0A0A0A` },
+                  { data: filteredDataPresion.map(data => data.presion_diastolica || 0), color: () => `#3A3A3A` },
                 ],
               }}
-              width={screenWidth * 0.9}
+              width={filteredDataPresion.length * 60}
               height={220}
               fromZero={true}
               showBarTops={false}
@@ -164,24 +153,18 @@ const PesoPresionChart = () => {
                 backgroundGradientFrom: '#f5f5f5',
                 backgroundGradientTo: '#e0e0e0',
                 decimalPlaces: 0,
-                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                style: {
-                  borderRadius: 16,
-                },
-                propsForBackgroundLines: {
-                  stroke: "#ccc",
-                  strokeDasharray: "0",
-                },
+                color: (opacity) => `rgba(0, 0, 0, ${opacity})`,
+                labelColor: (opacity) => `rgba(0, 0, 0, ${opacity})`,
+                style: { borderRadius: 16 },
+                propsForBackgroundLines: { stroke: "#ccc", strokeDasharray: "0" },
                 barPercentage: 0.5,
               }}
-              style={tw`my-4 rounded-lg`}
+              style={tw`rounded-lg`}
             />
-          ) : (
-            <Text style={tw`text-center text-gray-500`}>No hay datos de presión disponibles.</Text>
-          )}
+          </ScrollView>
         </View>
 
+        {/* Gráfico de Peso */}
         <View style={tw`bg-green-100 p-4 rounded-lg`}>
           <Text style={tw`text-lg font-bold text-green-700`}>Mi peso histórico</Text>
           <View style={tw`flex-row justify-between items-center mb-2`}>
@@ -210,18 +193,16 @@ const PesoPresionChart = () => {
               ))}
             </Picker>
           </View>
-          {filteredDataPeso.length > 0 ? (
+
+          <ScrollView horizontal={true} style={tw`overflow-hidden`}>
             <BarChart
               data={{
                 labels: filteredDataPeso.map(data => moment(data.fecha_registro).format('DD/MM')),
                 datasets: [
-                  {
-                    data: filteredDataPeso.map(data => data.peso || 0),
-                    color: () => `#1A1A1A`,
-                  }
+                  { data: filteredDataPeso.map(data => data.peso || 0), color: () => `#1A1A1A` },
                 ],
               }}
-              width={screenWidth * 0.9}
+              width={filteredDataPeso.length * 60}
               height={220}
               fromZero={true}
               showBarTops={false}
@@ -230,22 +211,15 @@ const PesoPresionChart = () => {
                 backgroundGradientFrom: '#f5f5f5',
                 backgroundGradientTo: '#e0e0e0',
                 decimalPlaces: 0,
-                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                style: {
-                  borderRadius: 16,
-                },
-                propsForBackgroundLines: {
-                  stroke: "#ccc",
-                  strokeDasharray: "0",
-                },
+                color: (opacity) => `rgba(0, 0, 0, ${opacity})`,
+                labelColor: (opacity) => `rgba(0, 0, 0, ${opacity})`,
+                style: { borderRadius: 16 },
+                propsForBackgroundLines: { stroke: "#ccc", strokeDasharray: "0" },
                 barPercentage: 0.5,
               }}
-              style={tw`my-4 rounded-lg`}
+              style={tw`rounded-lg`}
             />
-          ) : (
-            <Text style={tw`text-center text-gray-500`}>No hay datos de peso disponibles.</Text>
-          )}
+          </ScrollView>
         </View>
       </ScrollView>
     </SafeAreaView>
