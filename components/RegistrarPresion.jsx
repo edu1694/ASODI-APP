@@ -131,7 +131,6 @@ const RegistrarPresion = () => {
   };
 
   const renderItem = ({ item }) => {
-    console.log('Renderizando item:', item); // Verifica que se estén renderizando todos los elementos
     return (
       <View style={[tw`bg-white p-4 mb-3 rounded-lg flex-row justify-between items-center shadow`, { backgroundColor: '#e8f5e9' }]}>
         <View>

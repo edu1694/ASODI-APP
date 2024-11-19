@@ -9,7 +9,7 @@ import {
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import tw from 'tailwind-react-native-classnames';
-import { SafeAreaView } from 'react-native-safe-area-context'; // Asegúrate de importar correctamente SafeAreaView
+import { SafeAreaView } from 'react-native-safe-area-context';
 import baseUrl from '../lib/config';
 
 const Home = () => {
@@ -75,9 +75,7 @@ const Home = () => {
       if (!response.ok) {
         throw new Error('Error al obtener los anuncios');
       }
-
       const data = await response.json();
-      
       if (data.length > 0) {
         const sortedAnuncios = data.sort((a, b) => b.id_anuncio - a.id_anuncio);
         const ultimoAnuncio = sortedAnuncios[0];
@@ -87,6 +85,12 @@ const Home = () => {
       }
     } catch (error) {
       console.error('Error al obtener el último anuncio:', error);
+    }
+  };
+
+  const handleVerMas = () => {
+    if (ultimoAnuncio) {
+      navigation.navigate('Anuncios');
     }
   };
 
@@ -109,20 +113,27 @@ const Home = () => {
                 {ultimoAnuncio.titulo}
               </Text>
               <Text style={tw`text-base text-gray-700 text-center mb-4`}>
-                {ultimoAnuncio.descripcion}
+                {ultimoAnuncio.descripcion.length > 30
+                  ? `${ultimoAnuncio.descripcion.slice(0, 100)}...`
+                  : ultimoAnuncio.descripcion}
               </Text>
 
               {ultimoAnuncio.imagen && (
                 <Image
                   source={{ uri: `${baseUrl}${ultimoAnuncio.imagen}` }}
-                  style={tw`w-48 h-48 rounded-lg mx-auto mb-4`} // Ajuste del tamaño de la imagen (más pequeño)
+                  style={tw`w-48 h-48 rounded-lg mx-auto mb-4`}
                   resizeMode="cover"
                 />
               )}
-
               <Text style={tw`text-sm text-gray-600 text-center mb-2`}>
                 Este anuncio está disponible desde {ultimoAnuncio.fecha_inicio} hasta {ultimoAnuncio.fecha_termino}
               </Text>
+              <TouchableOpacity
+                onPress={handleVerMas}
+                style={tw`bg-green-500 p-2 rounded-lg mx-auto mt-2`}
+              >
+                <Text style={tw`text-white text-center`}>Ver Más</Text>
+              </TouchableOpacity>
             </View>
           ) : (
             <Text style={tw`text-center text-gray-500 mt-5`}>
